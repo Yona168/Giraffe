@@ -1,13 +1,17 @@
 package com.github.yona168.giraffe.net
 
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
-import java.net.InetSocketAddress
-import java.util.concurrent.TimeUnit
 
-fun main(){
-    val address= InetSocketAddress("localhost",1234)
-    val client=Client(address, TimeUnit.SECONDS, 20){print("Client timed out")}
-    client.enable()
-    runBlocking { delay(100000) }
+fun main()=runBlocking{
+val context= newSingleThreadContext("Test")
+    println("Thread is ${Thread.currentThread().name}")
+   val job= GlobalScope.launch(context) {
+        runBlocking {
+            println("Thread is ${Thread.currentThread().name}")
+        }
+    }
+    job.join()
 }

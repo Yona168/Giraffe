@@ -1,20 +1,20 @@
 package com.github.yona168.giraffe.net.packet
 
-import com.sun.jmx.remote.internal.ArrayQueue
+import com.github.yona168.giraffe.net.maxByteLength
 import java.nio.ByteBuffer
 import java.util.*
 
 typealias ByteBufferOp = (ByteBuffer).() -> Unit
+typealias Opcode = Short
+typealias Size = Int
 
-class Packet internal constructor() {
+class PacketBuilder internal constructor(val opcode: Opcode) {
     private val queueOperations = ArrayDeque<ByteBufferOp>()
-    private var amtBytes = 0
+    private var amtBytes: Size = 0
     val buffer: ByteBuffer by lazy {
-        val buffer = ByteBuffer.allocate(amtBytes)
-        queueOperations.forEach { it(buffer) }
+
         buffer
     }
-
 
     fun writeInt(i: Int) = write(Int.SIZE_BYTES) { putInt(i) }
     fun writeByte(b: Byte) = write(Byte.SIZE_BYTES) { put(b) }
@@ -29,14 +29,25 @@ class Packet internal constructor() {
     }
 
     private fun write(size: Int, op: ByteBufferOp) {
-        amtBytes += size
-        queueOperations.offerLast(op)
+        if (amtBytes + size > maxByteLength) {
+            throw IllegalArgumentException("Packet length cannot exceed $maxByteLength. Your size would have been ${maxByteLength + amtBytes}")
+        } else {
+            amtBytes += size
+            queueOperations.offerLast(op)
+        }
     }
 
+    internal fun build(): ByteBuffer {
+        val buffer = ByteBuffer.allocate(amtBytes)
+        queueOperations.offerFirst { putInt(amtBytes) }
+        queueOperations.offerFirst { putShort(opcode) }
+        queueOperations.forEach { it(buffer) }
+        return buffer
+    }
 }
 
-fun packet(packetFunc: Packet.() -> Unit): Packet {
-    val packet = Packet()
+fun packet(opcode: Short, packetFunc: PacketBuilder.() -> Unit): PacketBuilder {
+    val packet = PacketBuilder(opcode)
     packetFunc(packet)
     return packet
 }

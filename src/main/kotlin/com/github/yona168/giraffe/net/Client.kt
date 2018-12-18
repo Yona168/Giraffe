@@ -1,41 +1,50 @@
 package com.github.yona168.giraffe.net
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import com.github.yona168.giraffe.net.messenger.Networker
+import com.github.yona168.giraffe.net.messenger.Writable
+import com.github.yona168.giraffe.net.packet.Opcode
+import com.github.yona168.giraffe.net.packet.PacketBuilder
+import com.github.yona168.giraffe.net.packet.Size
+import kotlinx.coroutines.*
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
+import java.nio.CharBuffer
 import java.nio.channels.AlreadyConnectedException
-import java.nio.channels.AsynchronousByteChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
-class Client(address: InetSocketAddress, unit: TimeUnit, timeout: Long, onTimeoutFunction: (Client) -> Unit) :
-    Networker(), AsynchronousByteChannel {
-    private lateinit var channel: AsynchronousSocketChannel
+fun ByteBuffer.getOpcode() = short
+fun ByteBuffer.getSize() = int
+
+
+class Client : Networker(), Writable {
+
+    override lateinit var socketChannel: AsynchronousSocketChannel
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
-
-    override fun read(dst: ByteBuffer?): Future<Int> = channel.read(dst)
+    private val inbox = ByteBuffer.allocate(maxByteLength)
 
     init {
         onEnable {
-            channel= AsynchronousSocketChannel.open()
-            connectTo(address, unit, timeout, onTimeoutFunction)
+            socketChannel = AsynchronousSocketChannel.open()
+            launch {
+                readLooper()
+            }
         }
     }
 
-    private fun connectTo(
+    fun connectTo(
         address: InetSocketAddress,
         unit: TimeUnit,
         timeout: Long,
         onTimeoutFunction: (Client) -> Unit
     ) {
         val connectionResult = runCatching<Client> {
-            channel.connect(address).get(timeout, unit)
+            socketChannel.connect(address).get(timeout, unit)
             this
         }
         connectionResult.onFailure { exc ->
@@ -46,21 +55,56 @@ class Client(address: InetSocketAddress, unit: TimeUnit, timeout: Long, onTimeou
                 }
                 else -> {
                     onTimeoutFunction(this)
-                    close()
+                    socketChannel.close()
                 }
             }
         }
     }
 
-    override fun isOpen(): Boolean = channel.isOpen
-    override fun <A : Any?> write(src: ByteBuffer?, attachment: A, handler: CompletionHandler<Int, in A>?) =
-        channel.write(src, attachment, handler)
+    private suspend fun read() = suspendCancellableCoroutine<Int> {
+        socketChannel.read(inbox, it, ReadCompletionHandler)
+    }
 
-    override fun write(src: ByteBuffer?): Future<Int> = channel.write(src)
-    override fun close() = channel.close()
-    override fun <A : Any?> read(dst: ByteBuffer?, attachment: A, handler: CompletionHandler<Int, in A>?) =
-        channel.read(dst, attachment, handler)
+    override suspend fun write(builder: PacketBuilder) = suspendCancellableCoroutine<Int> {
+        socketChannel.write(inbox, it, WriteCompletionHandler)
+    }
 
+    private suspend fun readLooper() {
+        while (true) {
+            val readResult = read()
+            yield()
+            if (readResult == -1) {
+                disable()
+            }
+            var opcode: Opcode
+            var size: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES
+            while (size <= inbox.remaining()) {
+                opcode = inbox.getOpcode()
+                size = inbox.getSize()
+                if (inbox.remaining() < size) {
+                    inbox.compact()
+                } else {
+                    val buffer = bufferPool.buffer
+                    repeat(size) {
+                        buffer.put(inbox.get())
+                    }
+                    buffer.flip()
+                    withContext(Dispatchers.Main) {
+                        handlePacket(opcode, buffer)
+                        bufferPool.release(buffer)
+                    }
+                }
+            }
+        }
+    }
 
 }
+
+object ReadCompletionHandler : ContinuationCompletionHandler<Int>
+object WriteCompletionHandler : ContinuationCompletionHandler<Int>
+
+
+
+
+
 
