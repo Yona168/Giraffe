@@ -8,31 +8,26 @@ import com.github.yona168.giraffe.net.packet.Size
 import kotlinx.coroutines.*
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
-import java.nio.CharBuffer
 import java.nio.channels.AlreadyConnectedException
 import java.nio.channels.AsynchronousSocketChannel
-import java.nio.channels.CompletionHandler
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 fun ByteBuffer.getOpcode() = short
 fun ByteBuffer.getSize() = int
 
 
-class Client : Networker(), Writable {
-
-    override lateinit var socketChannel: AsynchronousSocketChannel
+class Client(override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()) : Networker(), Writable {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
     private val inbox = ByteBuffer.allocate(maxByteLength)
 
     init {
+
         onEnable {
-            socketChannel = AsynchronousSocketChannel.open()
-            launch {
-                readLooper()
+            runBlocking {
+
+                loopRead()
             }
         }
     }
@@ -55,7 +50,6 @@ class Client : Networker(), Writable {
                 }
                 else -> {
                     onTimeoutFunction(this)
-                    socketChannel.close()
                 }
             }
         }
@@ -66,15 +60,19 @@ class Client : Networker(), Writable {
     }
 
     override suspend fun write(builder: PacketBuilder) = suspendCancellableCoroutine<Int> {
-        socketChannel.write(inbox, it, WriteCompletionHandler)
+        val buf = builder.build()
+        while (buf.hasRemaining()) {
+            socketChannel.write(buf, it, WriteCompletionHandler)
+        }
     }
 
-    private suspend fun readLooper() {
+    private suspend fun loopRead() = launch {
         while (true) {
             val readResult = read()
             yield()
             if (readResult == -1) {
                 disable()
+                return@launch
             }
             var opcode: Opcode
             var size: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES

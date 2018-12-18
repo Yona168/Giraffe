@@ -1,17 +1,25 @@
 package com.github.yona168.giraffe.net
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.runBlocking
+import com.github.yona168.giraffe.net.packet.packet
+import kotlinx.coroutines.*
+import java.net.InetSocketAddress
+import java.util.concurrent.TimeUnit
 
-fun main()=runBlocking{
-val context= newSingleThreadContext("Test")
-    println("Thread is ${Thread.currentThread().name}")
-   val job= GlobalScope.launch(context) {
-        runBlocking {
-            println("Thread is ${Thread.currentThread().name}")
-        }
+fun main() = runBlocking {
+    val address = InetSocketAddress("localhost", 1234)
+    val server = GiraffeServer(address)
+    server.enable()
+    delay(500)
+    val client = Client()
+    client.connectTo(address, TimeUnit.SECONDS, 15) {}
+    client.enable()
+    delay(400)
+    client.registerPacket(1) {
+        println(it.readInt())
     }
-    job.join()
+    val packet = packet(1) {
+        writeInt(54)
+    }
+   server.sendToAllClients(packet)
+    delay(10000)
 }

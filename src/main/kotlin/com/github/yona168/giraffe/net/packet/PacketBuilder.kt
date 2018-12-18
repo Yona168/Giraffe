@@ -38,7 +38,7 @@ class PacketBuilder internal constructor(val opcode: Opcode) {
     }
 
     internal fun build(): ByteBuffer {
-        val buffer = ByteBuffer.allocate(amtBytes)
+        val buffer = ByteBuffer.allocate(amtBytes+Int.SIZE_BYTES+Opcode.SIZE_BYTES)
         queueOperations.offerFirst { putInt(amtBytes) }
         queueOperations.offerFirst { putShort(opcode) }
         queueOperations.forEach { it(buffer) }
