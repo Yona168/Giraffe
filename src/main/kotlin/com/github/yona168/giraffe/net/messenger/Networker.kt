@@ -12,18 +12,13 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousChannel
 
 typealias ReceivablePacket = ByteBufferWrapper
-typealias PacketHandler = (ReceivablePacket) -> Unit
 
-abstract class Networker() : Component(), CoroutineScope{
-    private val packetHandlers = mutableMapOf<Opcode, PacketHandler>()
+
+abstract class Networker : Component(), CoroutineScope, PacketHandler by PacketHandlerImpl(){
     protected abstract val socketChannel: AsynchronousChannel
     val bufferPool = ReceivablePacketPool()
     val job = Job()
-
     init {
-        onEnable {
-
-        }
         onDisable {
             runBlocking {
                 this.coroutineContext.cancelChildren()
@@ -34,14 +29,8 @@ abstract class Networker() : Component(), CoroutineScope{
             }
         }
     }
-
-    internal fun handlePacket(opcode: Opcode, buf: ReceivablePacket) {
-        packetHandlers[opcode]?.invoke(buf)
-    }
-
-    public fun registerPacket(opcode: Opcode, handler: PacketHandler) = packetHandlers.put(opcode, handler)
 }
 
 interface Writable{
-    suspend fun write(builder:PacketBuilder):Int
+   fun write(builder:PacketBuilder)
 }

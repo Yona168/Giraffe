@@ -42,6 +42,7 @@ class PacketBuilder internal constructor(val opcode: Opcode) {
         queueOperations.offerFirst { putInt(amtBytes) }
         queueOperations.offerFirst { putShort(opcode) }
         queueOperations.forEach { it(buffer) }
+        buffer.flip()
         return buffer
     }
 }

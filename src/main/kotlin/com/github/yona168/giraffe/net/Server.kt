@@ -12,6 +12,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -21,7 +22,7 @@ class GiraffeServer(address: InetSocketAddress) : Networker() {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
-    private val channels = emptySet<Client>().toMutableSet()
+    private val channels: MutableMap<AsynchronousSocketChannel, Client> = IdentityHashMap()
     override lateinit var socketChannel: AsynchronousServerSocketChannel
 
     init {
@@ -32,7 +33,7 @@ class GiraffeServer(address: InetSocketAddress) : Networker() {
                 while (true) {
                     val channel = accept()
                     println("Channel Accepted!")
-                    channels.add(Client(channel))
+                    channels[channel]=Client(channel)
                 }
             }
         }
@@ -46,7 +47,7 @@ class GiraffeServer(address: InetSocketAddress) : Networker() {
     fun sendToClient(client: Client, packet: PacketBuilder) = launch {
         client.write(packet)
     }
-    fun sendToAllClients(packet:PacketBuilder)=channels.forEach{sendToClient(it, packet)}
+    fun sendToAllClients(packet:PacketBuilder)=channels.values.forEach{sendToClient(it, packet)}
 
 }
 

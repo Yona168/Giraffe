@@ -14,12 +14,12 @@ fun main() = runBlocking {
     client.connectTo(address, TimeUnit.SECONDS, 15) {}
     client.enable()
     delay(400)
-    client.registerPacket(1) {
+    client.registerHandler(1) {
         println(it.readInt())
     }
     val packet = packet(1) {
         writeInt(54)
     }
    server.sendToAllClients(packet)
-    delay(10000)
+    delay(100000)
 }

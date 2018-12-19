@@ -17,16 +17,14 @@ fun ByteBuffer.getOpcode() = short
 fun ByteBuffer.getSize() = int
 
 
-class Client(override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()) : Networker(), Writable {
+class Client(override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()) : Networker(),
+    Writable {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
     private val inbox = ByteBuffer.allocate(maxByteLength)
-
     init {
-
         onEnable {
             runBlocking {
-
                 loopRead()
             }
         }
@@ -55,43 +53,52 @@ class Client(override val socketChannel: AsynchronousSocketChannel = Asynchronou
         }
     }
 
-    private suspend fun read() = suspendCancellableCoroutine<Int> {
-        socketChannel.read(inbox, it, ReadCompletionHandler)
+    private suspend fun read(): Int = suspendCancellableCoroutine { cont ->
+        socketChannel.read(inbox, cont, ReadCompletionHandler)
     }
 
-    override suspend fun write(builder: PacketBuilder) = suspendCancellableCoroutine<Int> {
-        val buf = builder.build()
-        while (buf.hasRemaining()) {
-            socketChannel.write(buf, it, WriteCompletionHandler)
+    override fun write(builder: PacketBuilder){
+        launch{
+            val buf=builder.build()
+            while(buf.hasRemaining()){
+                aWrite(buf)
+            }
         }
     }
 
-    private suspend fun loopRead() = launch {
-        while (true) {
-            val readResult = read()
-            yield()
-            if (readResult == -1) {
-                disable()
-                return@launch
-            }
-            var opcode: Opcode
-            var size: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES
-            while (size <= inbox.remaining()) {
-                opcode = inbox.getOpcode()
-                size = inbox.getSize()
-                if (inbox.remaining() < size) {
-                    inbox.compact()
-                } else {
-                    val buffer = bufferPool.buffer
-                    repeat(size) {
-                        buffer.put(inbox.get())
-                    }
-                    buffer.flip()
-                    withContext(Dispatchers.Main) {
-                        handlePacket(opcode, buffer)
-                        bufferPool.release(buffer)
+   private suspend fun aWrite(buf:ByteBuffer): Int = suspendCancellableCoroutine {
+            socketChannel.write(buf, it, WriteCompletionHandler)
+    }
+
+    private suspend fun loopRead() {
+        launch {
+            while (true) {
+                val readResult = read()
+                yield()
+                if (readResult == -1) {
+                    disable()
+                    return@launch
+                }
+                var opcode: Opcode
+                var size: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES
+                inbox.flip()
+                while (size <= inbox.remaining()) {
+                    opcode = inbox.getOpcode()
+                    size = inbox.getSize()
+                    if (inbox.remaining() < size) {
+                        inbox.compact()
+                    } else {
+                        val buffer = bufferPool.buffer
+                        repeat(size) {
+                            buffer.put(inbox.get())
+                        }
+                        buffer.flip()
+                            handlePacket(opcode, buffer)
+                            bufferPool.release(buffer)
+
                     }
                 }
+                inbox.flip()
             }
         }
     }
