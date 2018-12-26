@@ -8,7 +8,7 @@ typealias ByteBufferOp = (ByteBuffer).() -> Unit
 typealias Opcode = Short
 typealias Size = Int
 
-class PacketBuilder internal constructor(val opcode: Opcode) {
+class PacketBuilder constructor(val opcode: Opcode) {
     private val queueOperations = ArrayDeque<ByteBufferOp>()
     private var amtBytes: Size = 0
     val buffer: ByteBuffer by lazy {
@@ -47,7 +47,7 @@ class PacketBuilder internal constructor(val opcode: Opcode) {
     }
 }
 
-fun packet(opcode: Short, packetFunc: PacketBuilder.() -> Unit): PacketBuilder {
+inline fun packet(opcode: Short, packetFunc: PacketBuilder.() -> Unit): PacketBuilder {
     val packet = PacketBuilder(opcode)
     packetFunc(packet)
     return packet

@@ -1,15 +1,22 @@
-package com.github.yona168.giraffe.net
+package com.github.yona168.giraffe.net.messenger.client
 
-import com.github.yona168.giraffe.net.messenger.Networker
+import com.github.yona168.giraffe.net.ContinuationCompletionHandler
+import com.github.yona168.giraffe.net.maxByteLength
+import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.Writable
+import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.Opcode
 import com.github.yona168.giraffe.net.packet.PacketBuilder
 import com.github.yona168.giraffe.net.packet.Size
+import com.github.yona168.giraffe.net.packet.packet
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.AlreadyConnectedException
 import java.nio.channels.AsynchronousSocketChannel
+
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
@@ -17,16 +24,29 @@ fun ByteBuffer.getOpcode() = short
 fun ByteBuffer.getSize() = int
 
 
-class Client(override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()) : Networker(),
+class Client(
+    val uuid: UUID,
+    override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()
+) : AbstractScopedPacketChannelComponent(),
     Writable {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
     private val inbox = ByteBuffer.allocate(maxByteLength)
+    private val writeChannel = Channel<PacketBuilder>(0)
+
     init {
         onEnable {
-            runBlocking {
-                loopRead()
-            }
+                launch {
+                    loopRead()
+                }
+                launch {
+                    while (true) {
+                        val packet = writeChannel.receive().build()
+                        while (packet.hasRemaining()) {
+                            aWrite(packet)
+                        }
+                    }
+                }
         }
     }
 
@@ -38,6 +58,11 @@ class Client(override val socketChannel: AsynchronousSocketChannel = Asynchronou
     ) {
         val connectionResult = runCatching<Client> {
             socketChannel.connect(address).get(timeout, unit)
+            val packet = packet(0) {
+                writeLong(uuid.mostSignificantBits)
+                writeLong(uuid.leastSignificantBits)
+            }
+            write(packet)
             this
         }
         connectionResult.onFailure { exc ->
@@ -53,21 +78,19 @@ class Client(override val socketChannel: AsynchronousSocketChannel = Asynchronou
         }
     }
 
-    private suspend fun read(): Int = suspendCancellableCoroutine { cont ->
-        socketChannel.read(inbox, cont, ReadCompletionHandler)
+    internal suspend fun read(): Int = read(inbox)
+    internal suspend fun read(buf: ByteBuffer): Int = suspendCancellableCoroutine { cont ->
+        socketChannel.read(buf, cont, ReadCompletionHandler)
     }
 
-    override fun write(builder: PacketBuilder){
-        launch{
-            val buf=builder.build()
-            while(buf.hasRemaining()){
-                aWrite(buf)
-            }
+    override fun write(packet: PacketBuilder) {
+        launch {
+            writeChannel.send(packet)
         }
     }
 
-   private suspend fun aWrite(buf:ByteBuffer): Int = suspendCancellableCoroutine {
-            socketChannel.write(buf, it, WriteCompletionHandler)
+    private suspend fun aWrite(buf: ByteBuffer): Int = suspendCancellableCoroutine {
+        socketChannel.write(buf, it, WriteCompletionHandler)
     }
 
     private suspend fun loopRead() {
@@ -88,13 +111,14 @@ class Client(override val socketChannel: AsynchronousSocketChannel = Asynchronou
                     if (inbox.remaining() < size) {
                         inbox.compact()
                     } else {
-                        val buffer = bufferPool.buffer
+                        val buffer = bufferPool.nextItem
                         repeat(size) {
                             buffer.put(inbox.get())
                         }
                         buffer.flip()
-                            handlePacket(opcode, buffer)
-                            bufferPool.release(buffer)
+                        handlePacket(opcode, buffer, this@Client)
+                        buffer.clear()
+                        bufferPool.release(buffer)
 
                     }
                 }
@@ -106,9 +130,11 @@ class Client(override val socketChannel: AsynchronousSocketChannel = Asynchronou
 }
 
 object ReadCompletionHandler : ContinuationCompletionHandler<Int>
-object WriteCompletionHandler : ContinuationCompletionHandler<Int>
-
-
+object WriteCompletionHandler : ContinuationCompletionHandler<Int> {
+    override fun completed(result: Int, attachment: CancellableContinuation<Int>) {
+        super.completed(result, attachment)
+    }
+}
 
 
 

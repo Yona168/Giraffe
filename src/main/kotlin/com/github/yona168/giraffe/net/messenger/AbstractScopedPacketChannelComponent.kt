@@ -1,23 +1,23 @@
 package com.github.yona168.giraffe.net.messenger
 
 import com.github.yona168.giraffe.net.onDisable
-import com.github.yona168.giraffe.net.onEnable
-import com.github.yona168.giraffe.net.packet.Opcode
 import com.github.yona168.giraffe.net.packet.PacketBuilder
-import com.github.yona168.giraffe.net.packet.pool.ByteBufferWrapper
+import com.github.yona168.giraffe.net.packet.ReceivablePacket
+import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.github.yona168.giraffe.net.packet.pool.ReceivablePacketPool
 import com.gitlab.avelyn.architecture.base.Component
 import kotlinx.coroutines.*
-import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousChannel
 
-typealias ReceivablePacket = ByteBufferWrapper
 
+abstract class AbstractScopedPacketChannelComponent(packetHandler: PacketHandler) : Component(), CoroutineScope,
+    PacketHandler by packetHandler {
+    constructor() : this(PacketHandlerImpl())
 
-abstract class Networker : Component(), CoroutineScope, PacketHandler by PacketHandlerImpl(){
     protected abstract val socketChannel: AsynchronousChannel
     val bufferPool = ReceivablePacketPool()
     val job = Job()
+
     init {
         onDisable {
             runBlocking {
@@ -31,6 +31,4 @@ abstract class Networker : Component(), CoroutineScope, PacketHandler by PacketH
     }
 }
 
-interface Writable{
-   fun write(builder:PacketBuilder)
-}
+
