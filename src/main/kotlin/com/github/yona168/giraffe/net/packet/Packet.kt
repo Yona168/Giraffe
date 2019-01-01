@@ -8,14 +8,12 @@ typealias ByteBufferOp = (ByteBuffer).() -> Unit
 typealias Opcode = Short
 typealias Size = Int
 
-class PacketBuilder constructor(val opcode: Opcode) {
+
+class Packet constructor(val opcode: Opcode) {
+
     private val queueOperations = ArrayDeque<ByteBufferOp>()
     private var amtBytes: Size = 0
-    val buffer: ByteBuffer by lazy {
-
-        buffer
-    }
-
+    private var lock = false
     fun writeInt(i: Int) = write(Int.SIZE_BYTES) { putInt(i) }
     fun writeByte(b: Byte) = write(Byte.SIZE_BYTES) { put(b) }
     fun writeDouble(d: Double) = write(java.lang.Double.BYTES) { putDouble(d) }
@@ -29,6 +27,9 @@ class PacketBuilder constructor(val opcode: Opcode) {
     }
 
     private fun write(size: Int, op: ByteBufferOp) {
+        if (lock) {
+            throw IllegalAccessException("You cannot write to a packet after it has been locked!")
+        }
         if (amtBytes + size > maxByteLength) {
             throw IllegalArgumentException("Packet length cannot exceed $maxByteLength. Your size would have been ${maxByteLength + amtBytes}")
         } else {
@@ -37,18 +38,30 @@ class PacketBuilder constructor(val opcode: Opcode) {
         }
     }
 
-    internal fun build(): ByteBuffer {
-        val buffer = ByteBuffer.allocate(amtBytes+Int.SIZE_BYTES+Opcode.SIZE_BYTES)
+    internal fun lock() {
         queueOperations.offerFirst { putInt(amtBytes) }
         queueOperations.offerFirst { putShort(opcode) }
+        lock = true
+    }
+
+    fun isLocked() = lock
+
+    internal fun build(): ByteBuffer {
+        val buffer = ByteBuffer.allocate(amtBytes + Int.SIZE_BYTES + Opcode.SIZE_BYTES)
+        if(!isLocked()) {
+            lock()
+        }
         queueOperations.forEach { it(buffer) }
         buffer.flip()
         return buffer
     }
+
+
 }
 
-inline fun packet(opcode: Short, packetFunc: PacketBuilder.() -> Unit): PacketBuilder {
-    val packet = PacketBuilder(opcode)
+
+inline fun packet(opcode: Short, packetFunc: Packet.() -> Unit): Packet {
+    val packet = Packet(opcode)
     packetFunc(packet)
     return packet
 }

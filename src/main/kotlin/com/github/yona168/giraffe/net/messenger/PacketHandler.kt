@@ -1,5 +1,6 @@
 package com.github.yona168.giraffe.net.messenger
 
+import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.packet.Opcode
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 

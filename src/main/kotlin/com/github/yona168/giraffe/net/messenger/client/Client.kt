@@ -6,17 +6,16 @@ import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelCompo
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.Opcode
-import com.github.yona168.giraffe.net.packet.PacketBuilder
+import com.github.yona168.giraffe.net.packet.Packet
 import com.github.yona168.giraffe.net.packet.Size
-import com.github.yona168.giraffe.net.packet.packet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.AlreadyConnectedException
 import java.nio.channels.AsynchronousSocketChannel
-
 import java.util.*
+
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
@@ -24,29 +23,27 @@ fun ByteBuffer.getOpcode() = short
 fun ByteBuffer.getSize() = int
 
 
-class Client(
-    val uuid: UUID,
+class Client constructor(
     override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()
 ) : AbstractScopedPacketChannelComponent(),
     Writable {
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
-    private val inbox = ByteBuffer.allocate(maxByteLength)
-    private val writeChannel = Channel<PacketBuilder>(0)
+    internal val inbox = ByteBuffer.allocate(maxByteLength)
+    private val writingPipeline = Channel<Packet>(0)
 
     init {
         onEnable {
-                launch {
-                    loopRead()
-                }
-                launch {
-                    while (true) {
-                        val packet = writeChannel.receive().build()
-                        while (packet.hasRemaining()) {
-                            aWrite(packet)
-                        }
+            loopRead()
+            launch {
+                while (true) {
+                    val packet = writingPipeline.receive().build()
+                    while (packet.hasRemaining()) {
+                        aWrite(packet)
                     }
                 }
+            }
         }
     }
 
@@ -58,11 +55,6 @@ class Client(
     ) {
         val connectionResult = runCatching<Client> {
             socketChannel.connect(address).get(timeout, unit)
-            val packet = packet(0) {
-                writeLong(uuid.mostSignificantBits)
-                writeLong(uuid.leastSignificantBits)
-            }
-            write(packet)
             this
         }
         connectionResult.onFailure { exc ->
@@ -83,9 +75,9 @@ class Client(
         socketChannel.read(buf, cont, ReadCompletionHandler)
     }
 
-    override fun write(packet: PacketBuilder) {
+    override fun write(packet: Packet) {
         launch {
-            writeChannel.send(packet)
+            writingPipeline.send(packet)
         }
     }
 
@@ -93,7 +85,7 @@ class Client(
         socketChannel.write(buf, it, WriteCompletionHandler)
     }
 
-    private suspend fun loopRead() {
+    internal fun loopRead() {
         launch {
             while (true) {
                 val readResult = read()
@@ -116,10 +108,9 @@ class Client(
                             buffer.put(inbox.get())
                         }
                         buffer.flip()
+                        println("Client is handling!!!!")
                         handlePacket(opcode, buffer, this@Client)
-                        buffer.clear()
-                        bufferPool.release(buffer)
-
+                        bufferPool.clearAndRelease(buffer)
                     }
                 }
                 inbox.flip()

@@ -7,6 +7,7 @@ import java.nio.ByteBuffer
 import java.util.*
 
 class ReceivablePacketPool : AbstractPool<ReceivablePacket>() {
+    override fun clear(item: ReceivablePacket)=item.also { item.clear() }
     override fun createNew(): ReceivablePacket =
         ByteBufferWrapper(ByteBuffer.allocate(maxByteLength))
 }

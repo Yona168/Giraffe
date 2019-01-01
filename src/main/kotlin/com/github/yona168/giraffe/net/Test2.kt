@@ -13,17 +13,23 @@ fun main() = runBlocking {
     val server = GServer(address)
     server.enable()
     delay(500)
-    val id=UUID.randomUUID()
-    val client = Client(id)
+    val client = Client()
     client.connectTo(address, TimeUnit.SECONDS, 15) {}
     client.enable()
     delay(400)
-    client.registerHandler(1) {packet, client->
-        println(packet.readString())
+    client.registerHandler(1) { packet, client ->
+        println("Receiver=Client: ${packet.readString()}")
     }
+    server.registerHandler(1) { packet, client ->
+        println("Receiver=Server: ${packet.readString()}")
+    }
+
     val packet = packet(1) {
         writeString("Hello!!!")
     }
-   server.sendToAllClients(packet)
+   repeat(200) {
+       client.write(packet)
+   }
+
     delay(100000)
 }

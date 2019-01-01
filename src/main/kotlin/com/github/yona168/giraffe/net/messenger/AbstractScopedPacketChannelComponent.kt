@@ -1,9 +1,6 @@
 package com.github.yona168.giraffe.net.messenger
 
 import com.github.yona168.giraffe.net.onDisable
-import com.github.yona168.giraffe.net.packet.PacketBuilder
-import com.github.yona168.giraffe.net.packet.ReceivablePacket
-import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.github.yona168.giraffe.net.packet.pool.ReceivablePacketPool
 import com.gitlab.avelyn.architecture.base.Component
 import kotlinx.coroutines.*
