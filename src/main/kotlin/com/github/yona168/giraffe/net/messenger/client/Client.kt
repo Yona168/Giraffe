@@ -42,6 +42,7 @@ class Client constructor(
                     while (packet.hasRemaining()) {
                         aWrite(packet)
                     }
+                    yield()
                 }
             }
         }
