@@ -19,6 +19,9 @@ fun main() = runBlocking {
     delay(400)
     client.registerHandler(1) { packet, client ->
         println("Receiver=Client: ${packet.readString()}")
+        repeat(20){
+            println(packet.readInt())
+        }
     }
     server.registerHandler(1) { packet, client ->
         println("Receiver=Server: ${packet.readString()}")
@@ -26,10 +29,13 @@ fun main() = runBlocking {
 
     val packet = packet(1) {
         writeString("Hello!!!")
+        repeat(20){
+            writeInt(it)
+        }
     }
-   repeat(200) {
-       client.write(packet)
-   }
+    repeat(20) {
+        server.sendToAllClients(packet)
+    }
 
     delay(100000)
 }

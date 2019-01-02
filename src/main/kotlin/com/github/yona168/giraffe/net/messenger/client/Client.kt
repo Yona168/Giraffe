@@ -14,8 +14,6 @@ import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.AlreadyConnectedException
 import java.nio.channels.AsynchronousSocketChannel
-import java.util.*
-
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
@@ -30,21 +28,38 @@ class Client constructor(
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
-    internal val inbox = ByteBuffer.allocate(maxByteLength)
-    private val writingPipeline = Channel<Packet>(0)
 
-    init {
-        onEnable {
-            loopRead()
+    internal val inbox = ByteBuffer.allocate(maxByteLength)
+    private val controller: IReadWriteController = ReadWriteController()
+    private val writingPipeline = WritingPipeline()
+private val handler= CoroutineExceptionHandler{exc,thing->thing.printStackTrace()}
+    private inner class WritingPipeline {
+        private val channel = Channel<Packet>(0)
+
+        init {
             launch {
                 while (true) {
-                    val packet = writingPipeline.receive().build()
+                    val packet = channel.receive().build()
                     while (packet.hasRemaining()) {
+                        println("Wrote!")
                         aWrite(packet)
                     }
                     yield()
                 }
+
             }
+        }
+
+        fun send(packet: Packet) {
+            launch {
+                channel.send(packet)
+            }
+        }
+    }
+
+    init {
+        onEnable {
+            loopRead()
         }
     }
 
@@ -72,15 +87,12 @@ class Client constructor(
     }
 
     internal suspend fun read(): Int = read(inbox)
+
     internal suspend fun read(buf: ByteBuffer): Int = suspendCancellableCoroutine { cont ->
         socketChannel.read(buf, cont, ReadCompletionHandler)
     }
 
-    override fun write(packet: Packet) {
-        launch {
-            writingPipeline.send(packet)
-        }
-    }
+    override fun write(packet: Packet) = writingPipeline.send(packet)
 
     private suspend fun aWrite(buf: ByteBuffer): Int = suspendCancellableCoroutine {
         socketChannel.write(buf, it, WriteCompletionHandler)
@@ -89,17 +101,20 @@ class Client constructor(
     internal fun loopRead() {
         launch {
             while (true) {
+            controller.controlledAccess {
                 val readResult = read()
+                println(readResult)
                 yield()
                 if (readResult == -1) {
                     disable()
-                    return@launch
+                    -1
                 }
                 var opcode: Opcode
                 var size: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES
                 inbox.flip()
                 while (size <= inbox.remaining()) {
                     opcode = inbox.getOpcode()
+                    println("Opcode: $opcode")
                     size = inbox.getSize()
                     if (inbox.remaining() < size) {
                         inbox.compact()
@@ -113,8 +128,11 @@ class Client constructor(
                         handlePacket(opcode, buffer, this@Client)
                         bufferPool.clearAndRelease(buffer)
                     }
+                    size=Opcode.SIZE_BYTES+Size.SIZE_BYTES
                 }
                 inbox.flip()
+                1
+            }
             }
         }
     }
@@ -122,11 +140,7 @@ class Client constructor(
 }
 
 object ReadCompletionHandler : ContinuationCompletionHandler<Int>
-object WriteCompletionHandler : ContinuationCompletionHandler<Int> {
-    override fun completed(result: Int, attachment: CancellableContinuation<Int>) {
-        super.completed(result, attachment)
-    }
-}
+object WriteCompletionHandler : ContinuationCompletionHandler<Int>
 
 
 

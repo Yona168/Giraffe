@@ -11,7 +11,10 @@ import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.Opcode
 import com.github.yona168.giraffe.net.packet.Packet
 import com.github.yona168.giraffe.net.packet.Size
+import javafx.application.Application.launch
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
@@ -34,6 +37,7 @@ class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent
     override lateinit var socketChannel: AsynchronousServerSocketChannel
     override val clients: Set<Writable>
         get() = channels.values.map { it.client }.toSet()
+    private val mutex = Mutex()
 
     init {
         onEnable {
@@ -48,32 +52,34 @@ class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent
                     channels[uuid] = ClientBufferPair(client, ByteBuffer.allocate(maxByteLength))
                     launch readLaunch@{
                         while (true) {
-                            val read = client.read()
-                            if (read == -1) {
-                                removeChannel(uuid)
-                                return@readLaunch
-                            }
-                            val inbox = client.inbox
-                            inbox.flip()
-                            var opcode: Opcode
-                            var size = Opcode.SIZE_BYTES + Size.SIZE_BYTES
-                            while (size <= inbox.remaining()) {
-                                opcode = inbox.getOpcode()
-                                size = inbox.getSize()
-                                if (inbox.remaining() < size) {
-                                    inbox.compact()
-                                } else {
-                                    val packetBuffer=bufferPool.nextItem
-                                    repeat(size){
-                                        packetBuffer.put(inbox.get())
-                                    }
-                                    packetBuffer.flip()
-                                    println("Server handling!!!")
-                                    handlePacket(opcode,packetBuffer,client)
-                                    bufferPool.clearAndRelease(packetBuffer)
+                            mutex.withLock(client.inbox) {
+                                val read = client.read()
+                                if (read == -1) {
+                                    removeChannel(uuid)
+                                    return@readLaunch
                                 }
+                                val inbox = client.inbox
+                                inbox.flip()
+                                var opcode: Opcode
+                                var size = Opcode.SIZE_BYTES + Size.SIZE_BYTES
+                                while (size <= inbox.remaining()) {
+                                    opcode = inbox.getOpcode()
+                                    size = inbox.getSize()
+                                    if (inbox.remaining() < size) {
+                                        inbox.compact()
+                                    } else {
+                                        val packetBuffer = bufferPool.nextItem
+                                        repeat(size) {
+                                            packetBuffer.put(inbox.get())
+                                        }
+                                        packetBuffer.flip()
+                                        println("Server handling!!!")
+                                        handlePacket(opcode, packetBuffer, client)
+                                        bufferPool.clearAndRelease(packetBuffer)
+                                    }
+                                }
+                                inbox.flip()
                             }
-                            inbox.flip()
                         }
                     }
                     yield()
