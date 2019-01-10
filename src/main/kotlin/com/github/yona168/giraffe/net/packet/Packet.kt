@@ -27,7 +27,7 @@ class Packet constructor(val opcode: Opcode) {
     }
 
     private fun write(size: Int, op: ByteBufferOp) {
-        if (lock) {
+        if (isLocked()) {
             throw IllegalAccessException("You cannot write to a packet after it has been locked!")
         }
         if (amtBytes + size > maxByteLength) {
@@ -47,7 +47,7 @@ class Packet constructor(val opcode: Opcode) {
     fun isLocked() = lock
 
     internal fun build(): ByteBuffer {
-        val buffer = ByteBuffer.allocate(amtBytes + Int.SIZE_BYTES + Opcode.SIZE_BYTES)
+        val buffer = ByteBuffer.allocate(amtBytes + Size.SIZE_BYTES + Opcode.SIZE_BYTES)
         if(!isLocked()) {
             lock()
         }

@@ -8,9 +8,12 @@ import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.Opcode
 import com.github.yona168.giraffe.net.packet.Packet
 import com.github.yona168.giraffe.net.packet.Size
+import jdk.nashorn.internal.runtime.regexp.joni.constants.OPCode
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.net.InetSocketAddress
+import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.channels.AlreadyConnectedException
 import java.nio.channels.AsynchronousSocketChannel
@@ -30,36 +33,14 @@ class Client constructor(
         get() = Dispatchers.IO + job
 
     internal val inbox = ByteBuffer.allocate(maxByteLength)
-    private val controller: IReadWriteController = ReadWriteController()
-    private val writingPipeline = WritingPipeline()
-private val handler= CoroutineExceptionHandler{exc,thing->thing.printStackTrace()}
-    private inner class WritingPipeline {
-        private val channel = Channel<Packet>(0)
+    private val controller = Mutex()
 
-        init {
-            launch {
-                while (true) {
-                    val packet = channel.receive().build()
-                    while (packet.hasRemaining()) {
-                        println("Wrote!")
-                        aWrite(packet)
-                    }
-                    yield()
-                }
-
-            }
-        }
-
-        fun send(packet: Packet) {
-            launch {
-                channel.send(packet)
-            }
-        }
-    }
 
     init {
         onEnable {
-            loopRead()
+            launch{
+                testLoopRead()
+            }
         }
     }
 
@@ -86,62 +67,94 @@ private val handler= CoroutineExceptionHandler{exc,thing->thing.printStackTrace(
         }
     }
 
-    internal suspend fun read(): Int = read(inbox)
+    internal suspend fun read(): Int{
+        val read=read(inbox)
+        if(read==-1){
+            this@Client.disable()
+            println("ERROR")
+            return 0
+        }
+        else return read
+
+    }
 
     internal suspend fun read(buf: ByteBuffer): Int = suspendCancellableCoroutine { cont ->
         socketChannel.read(buf, cont, ReadCompletionHandler)
     }
 
-    override fun write(packet: Packet) = writingPipeline.send(packet)
+    override fun write(packet: Packet) {
+        launch {
+            controller.withLock {
+                val buf = packet.build()
+                while (buf.hasRemaining()) {
+                    aWrite(buf)
+                }
+            }
+        }
+    }
 
     private suspend fun aWrite(buf: ByteBuffer): Int = suspendCancellableCoroutine {
         socketChannel.write(buf, it, WriteCompletionHandler)
     }
+    //NOT WORKING YET
+    internal suspend fun testLoopRead() {
+        var opcode: Opcode? = null
+        var size = opcodeAndSizeSize
+        var currentRead = 0
+        while(true) {
+            if (currentRead < size) {
+                while (currentRead < size) {
+                    currentRead += read()
+                }
+            }
+            inbox.flip()
+            if(opcode==null){
+                currentRead-=size
+                opcode=inbox.getOpcode()
+                size=inbox.getSize()
+                inbox.unflip()
+                continue
+            }
+            val buffer = bufferPool.nextItem
+            val builder = StringBuilder()
+            repeat(size) {
+                val gotten = inbox.get()
+                builder.append(gotten)
+                buffer.put(gotten)
+            }
+            currentRead-=size
+            println(builder.toString())
+            buffer.flip()
+            println("Buf size: ${buffer.buffer.remaining()}")
+            println("Client is handling! Opcode=$opcode ReadSize=$size")
+            handlePacket(
+                opcode,
+                buffer,
+                this@Client
+            )
+            bufferPool.clearAndRelease(buffer)
+            opcode = null
+            size = opcodeAndSizeSize
+            inbox.clearReadBytes()
+            inbox.unflip()
 
-    internal fun loopRead() {
-        launch {
-            while (true) {
-            controller.controlledAccess {
-                val readResult = read()
-                println(readResult)
-                yield()
-                if (readResult == -1) {
-                    disable()
-                    -1
-                }
-                var opcode: Opcode
-                var size: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES
-                inbox.flip()
-                while (size <= inbox.remaining()) {
-                    opcode = inbox.getOpcode()
-                    println("Opcode: $opcode")
-                    size = inbox.getSize()
-                    if (inbox.remaining() < size) {
-                        inbox.compact()
-                    } else {
-                        val buffer = bufferPool.nextItem
-                        repeat(size) {
-                            buffer.put(inbox.get())
-                        }
-                        buffer.flip()
-                        println("Client is handling!!!!")
-                        handlePacket(opcode, buffer, this@Client)
-                        bufferPool.clearAndRelease(buffer)
-                    }
-                    size=Opcode.SIZE_BYTES+Size.SIZE_BYTES
-                }
-                inbox.flip()
-                1
-            }
-            }
         }
+
+
+
     }
+
 
 }
 
 object ReadCompletionHandler : ContinuationCompletionHandler<Int>
 object WriteCompletionHandler : ContinuationCompletionHandler<Int>
 
+private val opcodeAndSizeSize = Opcode.SIZE_BYTES + Size.SIZE_BYTES
 
-
-
+private fun ByteBuffer.unflip() = limit(limit()+1).position(limit()).limit(capacity())
+private fun ByteBuffer.clearReadBytes(): Buffer {
+    val currentPosition=position()
+    val currentLimit=limit()
+    return compact().limit(currentLimit-currentPosition).position(0)
+}

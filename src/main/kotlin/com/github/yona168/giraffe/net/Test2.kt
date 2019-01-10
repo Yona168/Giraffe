@@ -8,34 +8,52 @@ import java.net.InetSocketAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-fun main() = runBlocking {
-    val address = InetSocketAddress("localhost", 1234)
-    val server = GServer(address)
-    server.enable()
-    delay(500)
-    val client = Client()
-    client.connectTo(address, TimeUnit.SECONDS, 15) {}
-    client.enable()
-    delay(400)
-    client.registerHandler(1) { packet, client ->
-        println("Receiver=Client: ${packet.readString()}")
-        repeat(20){
-            println(packet.readInt())
+fun main() {
+    runBlocking {
+        val address = InetSocketAddress("localhost", 1234)
+        val server = GServer(address)
+        server.enable()
+        val client = Client()
+        client.connectTo(address, TimeUnit.SECONDS, 15) {}
+        client.enable()
+        val waiter = ReallyLongWaiterThing()
+        var counter=0
+        client.registerHandler(1) { packet, client ->
+            repeat(20) {
+                print(packet.readInt())
+            }
+            counter++
+            if(counter==30){
+                waiter.result=true
+            }
         }
-    }
-    server.registerHandler(1) { packet, client ->
-        println("Receiver=Server: ${packet.readString()}")
+        client.registerHandler(0) { packet, client ->
+            println("UUID= ${packet.readLong()} and ${packet.readLong()}")
+        }
+        server.registerHandler(1) { packet, client ->
+            println("Receiver=Server: ${packet.readString()}")
+        }
+
+        val packet = packet(1) {
+            repeat(20) {
+                writeInt(8)
+            }
+        }
+        repeat(30) {
+            server.sendToAllClients(packet)
+            println("Wrote packet")
+        }
+        val job = launch(newSingleThreadContext("Testing")) {
+            while (!waiter.result) {
+                delay(100000)
+            }
+        }
+        job.join()
+        println("Here")
     }
 
-    val packet = packet(1) {
-        writeString("Hello!!!")
-        repeat(20){
-            writeInt(it)
-        }
-    }
-    repeat(20) {
-        server.sendToAllClients(packet)
-    }
-
-    delay(100000)
+    Thread.yield()
 }
+
+
+class ReallyLongWaiterThing(var result: Boolean = false)

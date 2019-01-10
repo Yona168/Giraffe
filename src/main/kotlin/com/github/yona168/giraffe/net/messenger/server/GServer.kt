@@ -48,40 +48,9 @@ class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent
                     val clientChannel = accept()
                     val uuid = UUID.randomUUID()
                     val client = Client(clientChannel)
+                    println("UUID=${uuid.leastSignificantBits} and ${uuid.mostSignificantBits}")
                     sendToClient(client, uuidPacket(uuid))
                     channels[uuid] = ClientBufferPair(client, ByteBuffer.allocate(maxByteLength))
-                    launch readLaunch@{
-                        while (true) {
-                            mutex.withLock(client.inbox) {
-                                val read = client.read()
-                                if (read == -1) {
-                                    removeChannel(uuid)
-                                    return@readLaunch
-                                }
-                                val inbox = client.inbox
-                                inbox.flip()
-                                var opcode: Opcode
-                                var size = Opcode.SIZE_BYTES + Size.SIZE_BYTES
-                                while (size <= inbox.remaining()) {
-                                    opcode = inbox.getOpcode()
-                                    size = inbox.getSize()
-                                    if (inbox.remaining() < size) {
-                                        inbox.compact()
-                                    } else {
-                                        val packetBuffer = bufferPool.nextItem
-                                        repeat(size) {
-                                            packetBuffer.put(inbox.get())
-                                        }
-                                        packetBuffer.flip()
-                                        println("Server handling!!!")
-                                        handlePacket(opcode, packetBuffer, client)
-                                        bufferPool.clearAndRelease(packetBuffer)
-                                    }
-                                }
-                                inbox.flip()
-                            }
-                        }
-                    }
                     yield()
                 }
             }
