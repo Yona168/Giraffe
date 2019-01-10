@@ -1,15 +1,13 @@
 package com.github.yona168.giraffe.net.packet
 
-import com.github.yona168.giraffe.net.maxByteLength
+import com.github.yona168.giraffe.net.ByteBufferOp
+import com.github.yona168.giraffe.net.MAX_PACKET_BYTE_SIZE
+import com.github.yona168.giraffe.net.Opcode
+import com.github.yona168.giraffe.net.Size
 import java.nio.ByteBuffer
 import java.util.*
 
-typealias ByteBufferOp = (ByteBuffer).() -> Unit
-typealias Opcode = Short
-typealias Size = Int
-
-
-class Packet constructor(val opcode: Opcode) {
+class Packet constructor(private val opcode: Opcode) {
 
     private val queueOperations = ArrayDeque<ByteBufferOp>()
     private var amtBytes: Size = 0
@@ -30,8 +28,8 @@ class Packet constructor(val opcode: Opcode) {
         if (isLocked()) {
             throw IllegalAccessException("You cannot write to a packet after it has been locked!")
         }
-        if (amtBytes + size > maxByteLength) {
-            throw IllegalArgumentException("Packet length cannot exceed $maxByteLength. Your size would have been ${maxByteLength + amtBytes}")
+        if (amtBytes + size > MAX_PACKET_BYTE_SIZE) {
+            throw IllegalArgumentException("Packet length cannot exceed $MAX_PACKET_BYTE_SIZE. Your size would have been ${MAX_PACKET_BYTE_SIZE + amtBytes}")
         } else {
             amtBytes += size
             queueOperations.offerLast(op)

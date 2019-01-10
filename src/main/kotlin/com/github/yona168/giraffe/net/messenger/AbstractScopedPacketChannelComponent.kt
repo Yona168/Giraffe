@@ -7,9 +7,7 @@ import kotlinx.coroutines.*
 import java.nio.channels.AsynchronousChannel
 
 
-abstract class AbstractScopedPacketChannelComponent(packetHandler: PacketHandler) : Component(), CoroutineScope,
-    PacketHandler by packetHandler {
-    constructor() : this(PacketHandlerImpl())
+abstract class AbstractScopedPacketChannelComponent : Component(), CoroutineScope{
 
     protected abstract val socketChannel: AsynchronousChannel
     val bufferPool = ReceivablePacketPool()

@@ -3,13 +3,14 @@ package com.github.yona168.giraffe.net
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.server.GServer
 import com.github.yona168.giraffe.net.packet.packet
+import javafx.application.Application.launch
 import kotlinx.coroutines.*
 import java.net.InetSocketAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 fun main() {
-    runBlocking {
+
         val address = InetSocketAddress("localhost", 1234)
         val server = GServer(address)
         server.enable()
@@ -23,7 +24,7 @@ fun main() {
                 print(packet.readInt())
             }
             counter++
-            if(counter==30){
+            if(counter==3){
                 waiter.result=true
             }
         }
@@ -36,23 +37,16 @@ fun main() {
 
         val packet = packet(1) {
             repeat(20) {
-                writeInt(8)
+                writeInt(876)
             }
         }
-        repeat(30) {
+        repeat(3) {
             server.sendToAllClients(packet)
             println("Wrote packet")
         }
-        val job = launch(newSingleThreadContext("Testing")) {
-            while (!waiter.result) {
-                delay(100000)
-            }
-        }
-        job.join()
-        println("Here")
-    }
+        Thread.sleep(100000)
 
-    Thread.yield()
+
 }
 
 
