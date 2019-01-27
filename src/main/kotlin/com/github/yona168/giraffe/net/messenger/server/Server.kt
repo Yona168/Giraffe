@@ -8,5 +8,5 @@ interface Server {
     fun sendToClient(writable:Writable, packet:Packet)
     fun sendToClient(uuid: UUID, packet:Packet):Boolean
     fun sendToAllClients(packet:Packet)=clients.forEach { sendToClient(it, packet) }
-    val clients:Set<Writable>
+    val clients: Collection<Writable>
 }

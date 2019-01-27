@@ -1,41 +1,38 @@
 package com.github.yona168.giraffe.net.messenger.server
 
 import com.github.yona168.giraffe.net.ContinuationCompletionHandler
-import com.github.yona168.giraffe.net.MAX_PACKET_BYTE_SIZE
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.client.Client
+import com.github.yona168.giraffe.net.messenger.packetprocessor.CoroutineDispatcherPacketProcessor
+import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.Packet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.yield
 import java.net.InetSocketAddress
-import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
-import java.nio.channels.SocketChannel
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 
-class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent(), Server {
-    private class ClientBufferPair(internal val client: Client, internal val buffer: ByteBuffer) {
-        internal operator fun component1() = client
-        internal operator fun component2() = buffer
-    }
-
-
+class GServer @JvmOverloads constructor(
+    address: InetSocketAddress,
+    packetProcessor: PacketProcessor = CoroutineDispatcherPacketProcessor(
+        Dispatchers.Default
+    )
+) : AbstractScopedPacketChannelComponent(packetProcessor), Server {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
-    private val channels: MutableMap<UUID, ClientBufferPair> = ConcurrentHashMap()
+    private val channels: MutableMap<UUID, Client> = ConcurrentHashMap()
     override lateinit var socketChannel: AsynchronousServerSocketChannel
-    override val clients: Set<Writable>
-        get() = channels.values.map { it.client }.toSet()
-    private val mutex = Mutex()
+    override val clients: Collection<Writable>
+        get() = channels.values
 
+    private object AcceptHandler : ContinuationCompletionHandler<AsynchronousSocketChannel>()
     init {
         onEnable {
             socketChannel = AsynchronousServerSocketChannel.open()
@@ -43,11 +40,11 @@ class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent
             launch(coroutineContext) {
                 while (true) {
                     val clientChannel = accept()
-                    val uuid = UUID.randomUUID()
-                    val client = Client(clientChannel)
+                    val uuid = UUID.fromString("f5e9d8e2-18ec-4330-bdbc-2e41e9bb363f")
+                    val client = Client(packetProcessor, clientChannel)
                     println("UUID=${uuid.leastSignificantBits} and ${uuid.mostSignificantBits}")
                     sendToClient(client, uuidPacket(uuid))
-                    channels[uuid] = ClientBufferPair(client, ByteBuffer.allocate(MAX_PACKET_BYTE_SIZE))
+                    channels[uuid] = client
                     yield()
                 }
             }
@@ -61,7 +58,7 @@ class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent
         }
 
     override fun sendToClient(uuid: UUID, packet: Packet): Boolean {
-        val channel = channels[uuid]?.client
+        val channel = channels[uuid]
         if (channel != null) {
             sendToClient(channel, packet)
             return true
@@ -70,10 +67,7 @@ class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent
     }
 
     override fun sendToClient(writable: Writable, packet: Packet) {
-        launch(coroutineContext) {
-            writable.write(packet)
-            yield()
-        }
+        writable.write(packet)
 
     }
 
@@ -86,5 +80,5 @@ class GServer(address: InetSocketAddress) : AbstractScopedPacketChannelComponent
 
 
 
-private object AcceptHandler:ContinuationCompletionHandler<AsynchronousSocketChannel>()
+
 
