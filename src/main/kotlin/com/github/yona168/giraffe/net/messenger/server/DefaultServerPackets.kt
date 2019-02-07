@@ -1,9 +1,12 @@
 package com.github.yona168.giraffe.net.messenger.server
 
-import com.github.yona168.giraffe.net.packet.packet
+import com.github.yona168.giraffe.net.packet.packetBuilder
 import java.util.*
 
-internal fun uuidPacket(uuid: UUID)=packet(0){
-    writeLong(uuid.leastSignificantBits)
+
+fun uuidPacket(uuid: UUID) = packetBuilder(SESSION_UUID_PACKET_OPCODE) {
     writeLong(uuid.mostSignificantBits)
+    writeLong(uuid.leastSignificantBits)
 }
+
+const val SESSION_UUID_PACKET_OPCODE: Short = 0

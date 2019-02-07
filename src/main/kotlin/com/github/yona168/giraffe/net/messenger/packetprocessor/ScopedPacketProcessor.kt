@@ -12,7 +12,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 
 abstract class ScopedPacketProcessor : PacketProcessor, CoroutineScope, Component() {
-    protected val job = Job()
+    val job = Job()
 
     init {
         onDisable {

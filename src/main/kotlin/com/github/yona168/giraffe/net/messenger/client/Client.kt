@@ -4,29 +4,32 @@ import com.github.yona168.giraffe.net.*
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
-import com.github.yona168.giraffe.net.packet.Packet
+import com.github.yona168.giraffe.net.messenger.server.SESSION_UUID_PACKET_OPCODE
+import com.github.yona168.giraffe.net.packet.ReceivablePacket
+import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.net.InetSocketAddress
+import kotlinx.coroutines.withContext
+import java.net.SocketAddress
 import java.nio.ByteBuffer
-import java.nio.channels.AlreadyConnectedException
 import java.nio.channels.AsynchronousSocketChannel
+import java.nio.channels.CompletionHandler
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+import java.util.function.BiConsumer
+import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
-fun ByteBuffer.getOpcode() = short
-fun ByteBuffer.getSize() = int
-
-private const val OPCODE_AND_SIZE_BYTE_SIZE: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES
 
 class Client @JvmOverloads constructor(
     packetProcessor: PacketProcessor,
     override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()
 ) : AbstractScopedPacketChannelComponent(packetProcessor),
     Writable {
+
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
@@ -37,14 +40,19 @@ class Client @JvmOverloads constructor(
     private object ReadCompletionHandler : ContinuationCompletionHandler<Int>()
     private object WriteCompletionHandler : ContinuationCompletionHandler<Int>()
 
+    private val onConnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
+    private val onDisconnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
+    private val onPacketReceiveListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
+
+
     init {
         onEnable {
             loopRead()
         }
     }
 
-    fun connectTo(
-        address: InetSocketAddress,
+    fun connectBlocking(
+        address: SocketAddress,
         unit: TimeUnit,
         timeout: Long,
         onTimeoutFunction: (Client) -> Unit
@@ -53,21 +61,80 @@ class Client @JvmOverloads constructor(
             socketChannel.connect(address).get(timeout, unit)
             this
         }
+        connectionResult.onSuccess { doOnConnects() }
         connectionResult.onFailure { exc ->
-            print("Cause: ${exc.cause} Message: ${exc.message}")
             when (exc) {
-                is AlreadyConnectedException -> {
-                    error("Can't connect when Client is already connected!")
+                is TimeoutException -> {
+                    onTimeoutFunction(this)
                 }
                 else -> {
-                    onTimeoutFunction(this)
+                    throw exc
                 }
             }
         }
     }
 
+    fun connectBlocking(address: SocketAddress): Client {
+        connectBlocking(address, TimeUnit.DAYS, 1) {}
+        return this
+    }
+
+    fun connectNonBlocking(address: SocketAddress) {
+        socketChannel.connect(address, Unit, object : CompletionHandler<Void, Unit> {
+            override fun completed(result: Void?, attachment: Unit?) {
+                doOnConnects()
+            }
+
+            override fun failed(exc: Throwable, attachment: Unit?) {
+                throw exc
+            }
+
+        })
+    }
+
+    suspend fun connectWithContinuation(address: SocketAddress) = suspendCancellableCoroutine<Client> {
+        connectBlocking(address)
+        doOnConnects()
+        it.resumeWith(Result.success(this))
+    }
+
+    private fun doOnConnects() = onConnectListeners.forEach { it(this) }
+    override fun write(packet: SendablePacket) {
+        launch(coroutineContext) {
+            controller.withLock {
+                val buf = packet.build()
+                while (buf.hasRemaining()) {
+                    aWrite(buf)
+                }
+            }
+        }
+    }
+
+    fun onConnect(func: (Client) -> Unit) = onConnectListeners.add(func)
+    fun onConnect(func: () -> Unit) = onConnect { _: Client -> func() }
+    fun onConnect(func: Runnable) = onConnect { _: Client -> func.run() }
+    fun onConnect(func: Consumer<Client>) = onConnect { client -> func.accept(client) }
+
+    fun onDisconnect(func: (Client) -> Unit) = onDisconnectListeners.add(func)
+    fun onDisconnect(func: () -> Unit) = onDisconnect { _: Client -> func() }
+    fun onDisconnect(func: Runnable) = onDisconnect { _: Client -> func.run() }
+    fun onDisconnect(func: Consumer<Client>) = onDisconnect { client -> func.accept(client) }
+
+    fun onPacketReceive(func: (Client) -> Unit) = onPacketReceiveListeners.add(func)
+    fun onPacketReceive(func: () -> Unit) = onPacketReceive { _: Client -> func() }
+    fun onPacketReceive(func: Runnable) = onPacketReceive { _: Client -> func.run() }
+    fun onPacketReceive(func: Consumer<Client>) = onPacketReceive { client -> func.accept(client) }
+
+    fun onHandshake(func: PacketHandlerFunction) = packetProcessor.registerHandler(SESSION_UUID_PACKET_OPCODE, func)
+    fun onHandshake(func: BiConsumer<ReceivablePacket, Writable>) =
+        onHandshake { packet, client -> func.accept(packet, client) }
+
+    fun enableOnConnect() = onConnect { _ -> enable() }
+
     private suspend fun read(): Int {
-        val read = read(inbox)
+        val read = withContext(coroutineContext) {
+            read(inbox)
+        }
         return when (read) {
             -1 -> {
                 this@Client.disable()
@@ -81,32 +148,19 @@ class Client @JvmOverloads constructor(
         socketChannel.read(buf, cont, ReadCompletionHandler)
     }
 
-    override fun write(packet: Packet) {
-        launch(coroutineContext) {
-            controller.withLock {
-                val buf = packet.build()
-                while (buf.hasRemaining()) {
-                    aWrite(buf)
-                }
-            }
-        }
-    }
-
     private suspend fun aWrite(buf: ByteBuffer): Int = suspendCancellableCoroutine {
         socketChannel.write(buf, it, WriteCompletionHandler)
     }
 
-    private fun loopRead() = launch(coroutineContext) {
+
+    private fun loopRead() = launch(coroutineContext + Dispatchers.Default) {
         var opcode: Opcode? = null
         var size = OPCODE_AND_SIZE_BYTE_SIZE
         var currentRead = 0
         while (true) {
-            if (currentRead < size) {
                 while (currentRead < size) {
                     currentRead += read()
                 }
-                println()
-            }
 
             inbox.flip()
 
@@ -123,6 +177,7 @@ class Client @JvmOverloads constructor(
                     buffer.put(inbox.get())
                 }
                 buffer.flip()
+                onPacketReceiveListeners.forEach { it(this@Client) }
                 val setOpcode = opcode
                 launch {
                     packetProcessor.handlePacket(
@@ -141,6 +196,8 @@ class Client @JvmOverloads constructor(
 
     }
 
+    private fun ByteBuffer.getOpcode() = short
+    private fun ByteBuffer.getSize() = int
 
 }
 

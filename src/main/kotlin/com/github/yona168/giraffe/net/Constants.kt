@@ -24,3 +24,5 @@ internal open class ContinuationCompletionHandler<T>: CompletionHandler<T, Cance
     }
 
 }
+
+const val OPCODE_AND_SIZE_BYTE_SIZE: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES

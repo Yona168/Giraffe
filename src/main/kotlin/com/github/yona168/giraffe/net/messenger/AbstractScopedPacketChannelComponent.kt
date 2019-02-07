@@ -14,6 +14,7 @@ import java.nio.channels.AsynchronousChannel
 abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
     override val packetProcessor: PacketProcessor,
     protected val bufferPool: Pool<ReceivablePacket> = ReceivablePacketPool()
+
 ) : Component(),
     CanProcessPackets, CoroutineScope {
 

@@ -2,7 +2,7 @@ package com.github.yona168.giraffe.net.packet
 
 import java.nio.ByteBuffer
 
-class ByteBufferWrapper(private val buffer: ByteBuffer) : ReceivablePacket {
+class BasicReceivablePacket(private val buffer: ByteBuffer) : ReceivablePacket {
     override fun readInt() = buffer.int
     override fun readShort() = buffer.short
     override fun readLong() = buffer.long
@@ -30,16 +30,3 @@ class ByteBufferWrapper(private val buffer: ByteBuffer) : ReceivablePacket {
     }
 }
 
-interface ReceivablePacket {
-    fun readString(): String
-    fun readInt(): Int
-    fun readShort(): Short
-    fun readByte(): Byte
-    fun readDouble(): Double
-    fun readFloat(): Float
-    fun readLong(): Long
-    fun readChar(): Char
-    fun put(byte: Byte)
-    fun flip()
-    fun clear()
-}
