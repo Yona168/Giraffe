@@ -1,10 +1,14 @@
 package com.github.yona168.giraffe.net.messenger.packetprocessor
 
 import com.github.yona168.giraffe.net.onEnable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.newFixedThreadPoolContext
+import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
-open class FixedThreadPoolPacketProcessor(numThreads: Int, name: String) : ScopedPacketProcessor() {
+@ExperimentalCoroutinesApi
+open class FixedThreadPoolPacketProcessor(numThreads: Int) : ScopedPacketProcessor() {
     override lateinit var coroutineContext: CoroutineContext
 
     init {
@@ -15,8 +19,7 @@ open class FixedThreadPoolPacketProcessor(numThreads: Int, name: String) : Scope
                 false -> {
                     when (numThreads <= 0) {
                         true -> throw IllegalArgumentException("Amount of threads must exceed 0! Your amount: $numThreads")
-
-                        false -> newFixedThreadPoolContext(numThreads, name)
+                        false-> Executors.newFixedThreadPool(numThreads).asCoroutineDispatcher()
                     }
                 }
             }

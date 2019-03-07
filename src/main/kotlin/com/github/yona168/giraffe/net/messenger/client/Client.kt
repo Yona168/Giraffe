@@ -3,33 +3,30 @@ package com.github.yona168.giraffe.net.messenger.client
 import com.github.yona168.giraffe.net.*
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.Writable
-import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
+import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
 import com.github.yona168.giraffe.net.messenger.server.SESSION_UUID_PACKET_OPCODE
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.SendablePacket
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import java.net.SocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
+import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
-
+@ExperimentalCoroutinesApi
 class Client @JvmOverloads constructor(
-    packetProcessor: PacketProcessor,
+    packetProcessor: ScopedPacketProcessor,
     override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()
 ) : AbstractScopedPacketChannelComponent(packetProcessor),
     Writable {
-
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
@@ -43,11 +40,16 @@ class Client @JvmOverloads constructor(
     private val onConnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
     private val onDisconnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
     private val onPacketReceiveListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
-
+    private var backingSessionUUID: UUID? = null
+    val sessionUUID:UUID?
+        get() = backingSessionUUID
 
     init {
         onEnable {
             loopRead()
+            onHandshake{packet, _->
+                backingSessionUUID=UUID(packet.readLong(), packet.readLong())
+            }
         }
     }
 
@@ -99,6 +101,7 @@ class Client @JvmOverloads constructor(
     }
 
     private fun doOnConnects() = onConnectListeners.forEach { it(this) }
+
     override fun write(packet: SendablePacket) {
         launch(coroutineContext) {
             controller.withLock {
@@ -153,14 +156,14 @@ class Client @JvmOverloads constructor(
     }
 
 
-    private fun loopRead() = launch(coroutineContext + Dispatchers.Default) {
+    private fun loopRead() = launch(coroutineContext+Dispatchers.Default) {
         var opcode: Opcode? = null
         var size = OPCODE_AND_SIZE_BYTE_SIZE
         var currentRead = 0
         while (true) {
-                while (currentRead < size) {
-                    currentRead += read()
-                }
+            while (currentRead < size) {
+                currentRead += read()
+            }
 
             inbox.flip()
 
@@ -179,7 +182,7 @@ class Client @JvmOverloads constructor(
                 buffer.flip()
                 onPacketReceiveListeners.forEach { it(this@Client) }
                 val setOpcode = opcode
-                launch {
+                launch(coroutineContext) {
                     packetProcessor.handlePacket(
                         setOpcode,
                         buffer,
@@ -191,14 +194,25 @@ class Client @JvmOverloads constructor(
                 size = OPCODE_AND_SIZE_BYTE_SIZE
                 inbox.compact()
             }
+
         }
-
-
     }
+
+    override suspend fun initShutdown() {
+        socketChannel.shutdownInput()
+        socketChannel.shutdownOutput()
+        socketChannel.close()
+    }
+
 
     private fun ByteBuffer.getOpcode() = short
     private fun ByteBuffer.getSize() = int
 
+    override fun hashCode(): Int {
+        return sessionUUID?.hashCode()?:-1 //TODO: FIX
+    }
+
+    override fun equals(other: Any?)=if(other is Client) sessionUUID==other.sessionUUID else false
 }
 
 

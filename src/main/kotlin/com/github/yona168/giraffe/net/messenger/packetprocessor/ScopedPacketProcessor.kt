@@ -6,11 +6,9 @@ import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.onDisable
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.gitlab.avelyn.architecture.base.Component
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
+@ExperimentalCoroutinesApi
 abstract class ScopedPacketProcessor : PacketProcessor, CoroutineScope, Component() {
     val job = Job()
 

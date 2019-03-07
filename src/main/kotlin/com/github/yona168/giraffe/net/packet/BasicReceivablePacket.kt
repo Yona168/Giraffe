@@ -17,8 +17,8 @@ class BasicReceivablePacket(private val buffer: ByteBuffer) : ReceivablePacket {
         return arr.map { it.toChar() }.joinToString("")
     }
 
-    override fun put(b: Byte) {
-        buffer.put(b)
+    override fun put(byte: Byte) {
+        buffer.put(byte)
     }
 
     override fun flip() {

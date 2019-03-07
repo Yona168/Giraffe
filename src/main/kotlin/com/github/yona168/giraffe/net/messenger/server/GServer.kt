@@ -5,23 +5,22 @@ import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelCompo
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
+import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
 import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.SendablePacket
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.*
 import java.net.SocketAddress
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
-
-class GServer @JvmOverloads constructor(
+@ExperimentalCoroutinesApi
+class GServer constructor(
     address: SocketAddress,
-    packetProcessor: PacketProcessor
+    packetProcessor: ScopedPacketProcessor
 ) : AbstractScopedPacketChannelComponent(packetProcessor), Server {
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
     private val channels: MutableMap<UUID, Client> = ConcurrentHashMap()
@@ -38,6 +37,7 @@ class GServer @JvmOverloads constructor(
                     val clientChannel = accept()
                     val uuid = UUID.randomUUID()
                     val client = Client(packetProcessor, clientChannel)
+                    client.enable()
                     channels[uuid] = client
                     client.write(uuidPacket(uuid))
                     yield()
@@ -64,6 +64,10 @@ class GServer @JvmOverloads constructor(
 
     private fun removeChannel(uuid: UUID) {
         channels.remove(uuid)
+    }
+
+    override suspend fun initShutdown() {
+        socketChannel.close()
     }
 
 
