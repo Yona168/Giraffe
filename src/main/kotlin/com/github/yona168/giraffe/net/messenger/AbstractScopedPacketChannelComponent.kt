@@ -10,7 +10,11 @@ import com.gitlab.avelyn.architecture.base.Component
 import kotlinx.coroutines.*
 import java.nio.channels.AsynchronousChannel
 
-
+/**
+ * This class links a [Component]'s enable/disable features to the jobs launched from
+ * a [CoroutineScope]. This is used a base class for [com.github.yona168.giraffe.net.messenger.server.GServer] and
+ * [com.github.yona168.giraffe.net.messenger.client.GClient]
+ */
 @ExperimentalCoroutinesApi
 abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
     override val packetProcessor: ScopedPacketProcessor,
@@ -28,17 +32,13 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
             runBlocking {
                 packetProcessor.coroutineContext.cancelChildren()
                 packetProcessor.coroutineContext.cancel()
-                print("Packet Processor: ${packetProcessor.isEnabled}")
                 this@AbstractScopedPacketChannelComponent.coroutineContext.cancelChildren()
                 this@AbstractScopedPacketChannelComponent.coroutineContext.cancel()
 
                 job.cancelChildren()
-                println(job.isCancelled)
-                println(this@AbstractScopedPacketChannelComponent.coroutineContext.isActive)
                 try {
                     job.cancelAndJoin()
                 } finally {
-                    print(job.isCancelled)
                 }
                 initShutdown()
                 print("Donezo")

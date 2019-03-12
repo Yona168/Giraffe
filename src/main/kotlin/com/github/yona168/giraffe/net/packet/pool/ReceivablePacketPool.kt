@@ -8,5 +8,5 @@ import java.nio.ByteBuffer
 class ReceivablePacketPool : AbstractPool<ReceivablePacket>() {
     override fun clear(item: ReceivablePacket) = item.apply(ReceivablePacket::clear)
     override fun createNew(): ReceivablePacket =
-        BasicReceivablePacket(ByteBuffer.allocate(MAX_PACKET_BYTE_SIZE))
+        BasicReceivablePacket(ByteBuffer.allocateDirect(MAX_PACKET_BYTE_SIZE))
 }

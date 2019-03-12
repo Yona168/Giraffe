@@ -3,11 +3,11 @@ package com.github.yona168.giraffe.net.messenger.server
 import com.github.yona168.giraffe.net.ContinuationCompletionHandler
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.Writable
-import com.github.yona168.giraffe.net.messenger.client.Client
-import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
+import com.github.yona168.giraffe.net.messenger.client.GClient
 import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
 import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.SendablePacket
+import com.github.yona168.giraffe.net.packet.uuidPacket
 import kotlinx.coroutines.*
 import java.net.SocketAddress
 import java.nio.channels.AsynchronousServerSocketChannel
@@ -23,7 +23,7 @@ class GServer constructor(
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
-    private val channels: MutableMap<UUID, Client> = ConcurrentHashMap()
+    private val channels: MutableMap<UUID, GClient> = ConcurrentHashMap()
     override lateinit var socketChannel: AsynchronousServerSocketChannel
     override val clients: Collection<Writable>
         get() = channels.values
@@ -36,7 +36,7 @@ class GServer constructor(
                 while (true) {
                     val clientChannel = accept()
                     val uuid = UUID.randomUUID()
-                    val client = Client(packetProcessor, clientChannel)
+                    val client = GClient(packetProcessor, clientChannel)
                     client.enable()
                     channels[uuid] = client
                     client.write(uuidPacket(uuid))

@@ -11,7 +11,7 @@ import kotlin.coroutines.resumeWithException
 const val MAX_PACKET_BYTE_SIZE = 4096
 
 typealias ByteBufferOp = (ByteBuffer).() -> Unit
-typealias Opcode = Short
+typealias Opcode = Byte
 typealias Size = Int
 typealias PacketHandlerFunction = (ReceivablePacket, Writable) -> Unit
 internal open class ContinuationCompletionHandler<T>: CompletionHandler<T, CancellableContinuation<T>> {

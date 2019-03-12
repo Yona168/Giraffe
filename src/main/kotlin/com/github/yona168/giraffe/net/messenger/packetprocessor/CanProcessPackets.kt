@@ -11,9 +11,9 @@ interface CanProcessPackets {
     suspend fun handlePacket(opcode: Opcode, packet: ReceivablePacket, networker: Writable) =
         packetProcessor.handlePacket(opcode, packet, networker)
 
-    fun registerHandler(opcode: Opcode, func: PacketHandlerFunction) = packetProcessor.registerHandler(opcode, func)
-    fun registerHandler(opcode: Opcode, func: BiConsumer<ReceivablePacket, Writable>) =
-        registerHandler(opcode) { packet, writable -> func.accept(packet, writable) }
+    fun register(opcode: Opcode, func: PacketHandlerFunction) = packetProcessor.reigster(opcode, func)
+    fun register(opcode: Opcode, func: BiConsumer<ReceivablePacket, Writable>) =
+        register(opcode) { packet, writable -> func.accept(packet, writable) }
 
     fun disableHandler(opcode: Opcode) = packetProcessor.disableHandler(opcode)
 }

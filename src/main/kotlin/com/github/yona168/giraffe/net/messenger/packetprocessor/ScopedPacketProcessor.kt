@@ -30,12 +30,12 @@ abstract class ScopedPacketProcessor : PacketProcessor, CoroutineScope, Componen
         handlerMap[opcode]?.invoke(packet, networker)
     }
 
-    override fun registerHandler(opcode: Opcode, func: PacketHandlerFunction) {
-        handlerMap[opcode] = func
+    override fun reigster(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction? {
+        return handlerMap.put(opcode, func)
     }
 
-    override fun disableHandler(opcode: Opcode) {
-        handlerMap.remove(opcode)
+    override fun disableHandler(opcode: Opcode): PacketHandlerFunction? {
+        return handlerMap.remove(opcode)
     }
 
 }

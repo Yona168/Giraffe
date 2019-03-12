@@ -7,8 +7,8 @@ import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
 
 interface PacketProcessor : Toggleable {
-    fun registerHandler(opcode: Opcode, func: PacketHandlerFunction)
-    fun disableHandler(opcode: Opcode)
+    fun reigster(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction?
+    fun disableHandler(opcode: Opcode): PacketHandlerFunction?
     suspend fun handlePacket(opcode: Opcode, packet: ReceivablePacket, networker: Writable)
 
 }
