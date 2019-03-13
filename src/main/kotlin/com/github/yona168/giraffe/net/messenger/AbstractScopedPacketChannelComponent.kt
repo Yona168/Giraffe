@@ -25,28 +25,34 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
 
     protected abstract val socketChannel: AsynchronousChannel
     val job = Job()
-
+    private val preDisconnectListeners: MutableSet<() -> Unit> = mutableSetOf()
+    private val postDisconnectListeners: MutableSet<() -> Unit> = mutableSetOf()
     init {
         addChild(packetProcessor)
         onDisable {
             runBlocking {
+                preDisconnectListeners.forEach { it() }
+                prepareShutdown()
                 packetProcessor.coroutineContext.cancelChildren()
                 packetProcessor.coroutineContext.cancel()
                 this@AbstractScopedPacketChannelComponent.coroutineContext.cancelChildren()
                 this@AbstractScopedPacketChannelComponent.coroutineContext.cancel()
-
                 job.cancelChildren()
                 try {
                     job.cancelAndJoin()
                 } finally {
                 }
                 initShutdown()
-                print("Donezo")
+                postDisconnectListeners.forEach { it() }
             }
         }
     }
 
+    protected abstract suspend fun prepareShutdown()
     protected abstract suspend fun initShutdown()
+
+    fun prepareShutdown(func: () -> Unit) = preDisconnectListeners.add(func)
+    fun postShutdown(func: () -> Unit) = postDisconnectListeners.add(func)
 }
 
 

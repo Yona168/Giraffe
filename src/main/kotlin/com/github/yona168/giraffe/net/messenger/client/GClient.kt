@@ -4,10 +4,7 @@ import com.github.yona168.giraffe.net.*
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
-import com.github.yona168.giraffe.net.packet.HANDSHAKE_SUB_IDENTIFIER
-import com.github.yona168.giraffe.net.packet.INTERNAL_OPCODE
-import com.github.yona168.giraffe.net.packet.ReceivablePacket
-import com.github.yona168.giraffe.net.packet.SendablePacket
+import com.github.yona168.giraffe.net.packet.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,21 +13,37 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousSocketChannel
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import java.util.function.BiConsumer
-import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 /**
  * The basic implementation of
  */
 @ExperimentalCoroutinesApi
-class GClient @JvmOverloads constructor(
-    private val address: SocketAddress,
+class GClient constructor(
+    address: SocketAddress?,
     packetProcessor: ScopedPacketProcessor,
-    override val socketChannel: AsynchronousSocketChannel = AsynchronousSocketChannel.open()
+    override val socketChannel: AsynchronousSocketChannel
 ) : AbstractScopedPacketChannelComponent(packetProcessor),
     Client {
+
+    constructor(
+        socketChannel: AsynchronousSocketChannel,
+        packetProcessor: ScopedPacketProcessor,
+        sessionUUID: UUID
+    ) : this(
+        address = null,
+        packetProcessor = packetProcessor,
+        socketChannel = socketChannel
+    ) {
+        backingSessionUUID = sessionUUID
+    }
+
+    constructor(address: SocketAddress, packetProcessor: ScopedPacketProcessor) : this(
+        address = address,
+        packetProcessor = packetProcessor,
+        socketChannel = AsynchronousSocketChannel.open()
+    )
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
@@ -45,15 +58,24 @@ class GClient @JvmOverloads constructor(
     private val onDisconnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
     private val onPacketReceiveListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
     private val onHandshakeListeners: MutableSet<PacketHandlerFunction> = mutableSetOf()
+    private val identifier = UUID.randomUUID()
+    private var waitingToShutDown = false
     private var backingSessionUUID: UUID? = null
     val sessionUUID: UUID?
         get() = backingSessionUUID
 
     init {
         onEnable {
+            if (socketChannel.isOpen && socketChannel.remoteAddress != null) {
+                Objects.requireNonNull(address)
+                connect(address as SocketAddress)
+            }
             packetProcessor.reigster(INTERNAL_OPCODE) { packet, client ->
-                if (packet.readByte() == HANDSHAKE_SUB_IDENTIFIER) {
-                    onHandshakeListeners.forEach { it(packet, this) }
+                val opcode = packet.readByte()
+                when (opcode) {
+                    HANDSHAKE_SUB_IDENTIFIER -> onHandshakeListeners.forEach { it(packet, this) }
+                    DISCONNECT_CONFIRMATION_SUB_IDENTIFIER -> waitingToShutDown = false
+                    ASK_TO_DISCONNECT -> disable()
                 }
             }
             onHandshake { packet, _ ->
@@ -66,28 +88,18 @@ class GClient @JvmOverloads constructor(
     private fun connect(
         address: SocketAddress,
         unit: TimeUnit,
-        timeout: Long,
-        onTimeoutFunction: (GClient) -> Unit
+        timeout: Long
     ) {
         val connectionResult = runCatching<GClient> {
             socketChannel.connect(address).get(timeout, unit)
             this
         }
         connectionResult.onSuccess { onConnectListeners.forEach { it(this) } }
-        connectionResult.onFailure { exc ->
-            when (exc) {
-                is TimeoutException -> {
-                    onTimeoutFunction(this)
-                }
-                else -> {
-                    throw exc
-                }
-            }
-        }
+        connectionResult.onFailure { exc -> throw exc }
     }
 
     fun connect(address: SocketAddress): GClient {
-        connect(address, TimeUnit.DAYS, 1) {}
+        connect(address, TimeUnit.MINUTES, 2)
         return this
     }
 
@@ -104,20 +116,12 @@ class GClient @JvmOverloads constructor(
 
     override fun onConnect(func: (Client) -> Unit) = onConnectListeners.add(func)
     override fun onConnect(func: () -> Unit) = onConnect { _: Client -> func() }
-    /*
-    override fun onConnect(func: Runnable) = onConnect { _: Client -> func.run() }
-    override fun onConnect(func: Consumer<Client>) = onConnect { client -> func.accept(client) }
-    */
 
     override fun onDisconnect(func: (Client) -> Unit) = onDisconnectListeners.add(func)
     override fun onDisconnect(func: () -> Unit) = onDisconnect { _: Client -> func() }
-    override fun onDisconnect(func: Runnable) = onDisconnect { _: Client -> func.run() }
-    override fun onDisconnect(func: Consumer<Client>) = onDisconnect { client -> func.accept(client) }
 
     override fun onPacketReceive(func: (Client) -> Unit) = onPacketReceiveListeners.add(func)
     override fun onPacketReceive(func: () -> Unit) = onPacketReceive { _: Client -> func() }
-    override fun onPacketReceive(func: Runnable) = onPacketReceive { _: Client -> func.run() }
-    override fun onPacketReceive(func: Consumer<Client>) = onPacketReceive { client -> func.accept(client) }
 
     fun onHandshake(func: PacketHandlerFunction): Boolean {
         return onHandshakeListeners.add(func)
@@ -156,9 +160,7 @@ class GClient @JvmOverloads constructor(
             while (currentRead < size) {
                 currentRead += read()
             }
-
             inbox.flip()
-
             if (opcode == null) {
                 currentRead -= size
                 opcode = inbox.getOpcode()
@@ -186,11 +188,21 @@ class GClient @JvmOverloads constructor(
                 size = OPCODE_AND_SIZE_BYTE_SIZE
                 inbox.compact()
             }
+        }
+    }
 
+    override suspend fun prepareShutdown(): Unit {
+        Objects.requireNonNull(sessionUUID)
+        write(disconnectRequest(sessionUUID as UUID))
+        while (!waitingToShutDown) {
+            yield()
         }
     }
 
     override suspend fun initShutdown() {
+        if (sessionUUID != null) {
+            write(disconnectRequest(sessionUUID as UUID))
+        }
         socketChannel.shutdownInput()
         socketChannel.shutdownOutput()
         socketChannel.close()
@@ -200,11 +212,9 @@ class GClient @JvmOverloads constructor(
     private fun ByteBuffer.getOpcode() = get()
     private fun ByteBuffer.getSize() = int
 
-    override fun hashCode(): Int {
-        return sessionUUID?.hashCode() ?: -1 //TODO: FIX
-    }
+    override fun hashCode() = identifier.hashCode()
 
-    override fun equals(other: Any?) = if (other is GClient) sessionUUID == other.sessionUUID else false
+    override fun equals(other: Any?) = other is GClient && identifier == other.identifier
 }
 
 

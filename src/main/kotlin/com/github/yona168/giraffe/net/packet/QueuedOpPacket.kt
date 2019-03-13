@@ -38,7 +38,7 @@ class QueuedOpPacket constructor(private val opcode: Opcode) : SendablePacket {
         if (!firstBuild) {
             firstBuild = true
             queueOperations.offerFirst { putInt(amtBytes) }
-            queueOperations.offerFirst { putShort(opcode) }
+            queueOperations.offerFirst { put(opcode) }
         }
         queueOperations.forEach { it(buffer) }
         buffer.flip()

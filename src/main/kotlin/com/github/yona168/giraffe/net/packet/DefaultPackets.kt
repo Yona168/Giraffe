@@ -20,7 +20,16 @@ fun disconnectConfirmation() = packetBuilder(INTERNAL_OPCODE) {
     writeByte(DISCONNECT_CONFIRMATION_SUB_IDENTIFIER)
 }
 
+fun askToDisconnect() = packetBuilder(INTERNAL_OPCODE) {
+    writeByte(ASK_TO_DISCONNECT)
+}
+
 const val INTERNAL_OPCODE: Opcode = -1
+
+//Client bound
 const val HANDSHAKE_SUB_IDENTIFIER: Opcode = 0
-const val DISCONNECT_REQUEST_SUB_IDENTIFIER: Opcode = 1
 const val DISCONNECT_CONFIRMATION_SUB_IDENTIFIER: Opcode = 2
+const val ASK_TO_DISCONNECT: Opcode = 3
+
+//Server Bound
+const val DISCONNECT_REQUEST_SUB_IDENTIFIER: Opcode = 1

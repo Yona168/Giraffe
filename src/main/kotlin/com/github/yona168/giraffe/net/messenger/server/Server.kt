@@ -7,6 +7,6 @@ import java.util.*
 
 interface Server : Toggleable {
     fun sendToClient(uuid: UUID, packet: SendablePacket): Boolean
-    fun sendToAllClients(packet: SendablePacket) = clients.forEach { it.write(packet) }
+    fun sendToAllClients(packetSupplier: () -> SendablePacket) = clients.forEach { it.write(packetSupplier()) }
     val clients: Collection<Writable>
 }
