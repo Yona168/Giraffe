@@ -2,12 +2,16 @@ package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.gitlab.avelyn.architecture.base.Toggleable
+import java.util.*
 
 /**
  * Defines the basic functionality of a client.
  *
  */
 interface Client : Writable, Toggleable {
+
+    val sessionUUID: UUID?
+
     /**
      * Tells the client to execute [func] when it connects to a server, using this
      * [Client] as a passed argument to that function.

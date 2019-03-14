@@ -34,8 +34,11 @@ class GServer constructor(
         onEnable {
             socketChannel = AsynchronousServerSocketChannel.open().bind(address)
             register(INTERNAL_OPCODE) { packet, client ->
-                when (INTERNAL_OPCODE) {
+                val subIdentifier = packet.readByte()
+                when (subIdentifier) {
                     DISCONNECT_REQUEST_SUB_IDENTIFIER -> {
+                        val uuidToRemove = packet.readUUID()
+                        sendToClient(uuidToRemove, disconnectConfirmation())
                         removeChannel(packet.readUUID())
                     }
                 }

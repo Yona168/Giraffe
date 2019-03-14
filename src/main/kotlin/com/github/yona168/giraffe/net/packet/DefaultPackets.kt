@@ -6,14 +6,12 @@ import java.util.*
 
 fun uuidPacket(uuid: UUID) = packetBuilder(INTERNAL_OPCODE) {
     writeByte(HANDSHAKE_SUB_IDENTIFIER)
-    writeLong(uuid.mostSignificantBits)
-    writeLong(uuid.leastSignificantBits)
+    writeUUID(uuid)
 }
 
 fun disconnectRequest(uuidOfClient: UUID) = packetBuilder(INTERNAL_OPCODE) {
     writeByte(DISCONNECT_REQUEST_SUB_IDENTIFIER)
-    writeLong(uuidOfClient.mostSignificantBits)
-    writeLong(uuidOfClient.leastSignificantBits)
+    writeUUID(uuidOfClient)
 }
 
 fun disconnectConfirmation() = packetBuilder(INTERNAL_OPCODE) {

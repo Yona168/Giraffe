@@ -2,10 +2,10 @@ package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.*
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
-import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
 import com.github.yona168.giraffe.net.packet.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.net.SocketAddress
@@ -13,7 +13,6 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousSocketChannel
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.function.BiConsumer
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -57,29 +56,28 @@ class GClient constructor(
     private val onConnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
     private val onDisconnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
     private val onPacketReceiveListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
-    private val onHandshakeListeners: MutableSet<PacketHandlerFunction> = mutableSetOf()
+    private val onHandshakeListeners: MutableSet<() -> Unit> = mutableSetOf()
     private val identifier = UUID.randomUUID()
-    private var waitingToShutDown = false
+    private val confirmShutdownChannel = Channel<Unit>()
     private var backingSessionUUID: UUID? = null
-    val sessionUUID: UUID?
+    override val sessionUUID: UUID?
         get() = backingSessionUUID
 
     init {
         onEnable {
-            if (socketChannel.isOpen && socketChannel.remoteAddress != null) {
+            if (!(socketChannel.isOpen && socketChannel.remoteAddress != null)) {
                 Objects.requireNonNull(address)
                 connect(address as SocketAddress)
             }
             packetProcessor.reigster(INTERNAL_OPCODE) { packet, client ->
                 val opcode = packet.readByte()
                 when (opcode) {
-                    HANDSHAKE_SUB_IDENTIFIER -> onHandshakeListeners.forEach { it(packet, this) }
-                    DISCONNECT_CONFIRMATION_SUB_IDENTIFIER -> waitingToShutDown = false
+                    HANDSHAKE_SUB_IDENTIFIER -> {
+                        backingSessionUUID = packet.readUUID()
+                        onHandshakeListeners.forEach { it() }
+                    }
                     ASK_TO_DISCONNECT -> disable()
                 }
-            }
-            onHandshake { packet, _ ->
-                backingSessionUUID = UUID(packet.readLong(), packet.readLong())
             }
             loopRead()
         }
@@ -123,12 +121,10 @@ class GClient constructor(
     override fun onPacketReceive(func: (Client) -> Unit) = onPacketReceiveListeners.add(func)
     override fun onPacketReceive(func: () -> Unit) = onPacketReceive { _: Client -> func() }
 
-    fun onHandshake(func: PacketHandlerFunction): Boolean {
+    fun onHandshake(func: () -> Unit): Boolean {
         return onHandshakeListeners.add(func)
     }
 
-    fun onHandshake(func: BiConsumer<ReceivablePacket, Writable>) =
-        onHandshake { packet, client -> func.accept(packet, client) }
 
     private suspend fun read(): Int {
         val read = withContext(coroutineContext) {
@@ -191,18 +187,12 @@ class GClient constructor(
         }
     }
 
-    override suspend fun prepareShutdown(): Unit {
+    override suspend fun prepareShutdown() {
         Objects.requireNonNull(sessionUUID)
         write(disconnectRequest(sessionUUID as UUID))
-        while (!waitingToShutDown) {
-            yield()
-        }
     }
 
     override suspend fun initShutdown() {
-        if (sessionUUID != null) {
-            write(disconnectRequest(sessionUUID as UUID))
-        }
         socketChannel.shutdownInput()
         socketChannel.shutdownOutput()
         socketChannel.close()
