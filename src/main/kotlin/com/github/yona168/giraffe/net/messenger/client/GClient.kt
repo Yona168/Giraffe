@@ -52,16 +52,14 @@ class GClient constructor(
 
     private lateinit var readWriteHandler: ContinuationCompletionHandler<Int>
 
-    private val preEnable: MutableSet<(IClient) -> Unit> = mutableSetOf()
-    private val preDisconnectListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
-    private val postDisconnectListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
+
     private val onPacketReceiveListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
     private val onHandshakeListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
     private val identifier = UUID.randomUUID()
     private var backingSessionUUID: UUID? = null
     override val sessionUUID: UUID?
         get() = backingSessionUUID
-    private var side: com.github.yona168.giraffe.net.messenger.client.Side? = null
+    private var side: Side? = null
 
     companion object {
         private object ReadWriteHandlerSupplier : (GClient) -> ContinuationCompletionHandler<Int> {
@@ -70,7 +68,7 @@ class GClient constructor(
                     throw IllegalStateException("Client does not have a side!")
                 }
                 return when (client.side as Side) {
-                    Serverside -> object : ContinuationCompletionHandler<Int>() {
+                    Side.Serverside -> object : ContinuationCompletionHandler<Int>() {
                         override fun failed(exc: Throwable, attachment: CancellableContinuation<Int>) {
                             runBlocking {
                                 client.disable()
@@ -78,7 +76,7 @@ class GClient constructor(
                         }
                     }
 
-                    Clientside -> object : ContinuationCompletionHandler<Int>() {
+                    Side.Clientside -> object : ContinuationCompletionHandler<Int>() {
                         override fun failed(exc: Throwable, attachment: CancellableContinuation<Int>) {
                             val message = exc.message
                             message ?: return
@@ -98,9 +96,9 @@ class GClient constructor(
         addChild(packetProcessor)
         onEnable {
             val notConnected = !(socketChannel.isOpen && socketChannel.remoteAddress != null)
-            side = if (notConnected) Clientside else Serverside
+            side = if (notConnected) Side.Clientside else Side.Serverside
             readWriteHandler = ReadWriteHandlerSupplier(this)
-            if (side is Clientside) {
+            if (side is Side.Clientside) {
                 Objects.requireNonNull(address)
                 connect(address as SocketAddress)
                 packetProcessor.on(INTERNAL_OPCODE) { packet, _ ->
@@ -115,7 +113,6 @@ class GClient constructor(
 
             }
             loopRead()
-            preEnable.forEach { it(this) }
         }
     }
 
@@ -142,11 +139,6 @@ class GClient constructor(
     }
 
 
-    override fun preEnable(func: (IClient) -> Unit) = preEnable.add(func)
-
-    override fun preDisconnect(func: (IClient) -> Unit) = preDisconnectListeners.add(func)
-
-    override fun postDisconnect(func: (IClient) -> Unit) = postDisconnectListeners.add(func)
 
     override fun onPacketReceive(func: (IClient) -> Unit) = onPacketReceiveListeners.add(func)
 
@@ -214,15 +206,8 @@ class GClient constructor(
         }
     }
 
-    override suspend fun close() {
-        preDisconnectListeners.forEach { it(this) }
+    override suspend fun initClose() {
         closer?.invoke(this)
-        Objects.requireNonNull(sessionUUID)
-        if (socketChannel.isOpen) {
-            socketChannel.close()
-        }
-        cancelCoroutines()
-        postDisconnectListeners.forEach { it(this) }
     }
 
     private fun ByteBuffer.getOpcode() = get()

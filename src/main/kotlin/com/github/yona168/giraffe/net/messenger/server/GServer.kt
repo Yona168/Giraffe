@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 
 /**
- * The given implementation for [Server]. This class uses a [MutableMap] to store client [UUID]s to their session [UUID]'s.
+ * The given implementation for [Server]. This class uses a [MutableMap] to store client [UUID]s to the serverside [Client] objects.
  * It overrides [CoroutineScope.coroutineContext] with [Dispatchers.IO]+[AbstractScopedPacketChannelComponent.job]. After
  * accepting a Client, it writes a handshake packet, giving it a session UUID as referenced by [IClient.sessionUUID]. Any
  * [Client] that uses this server should handle the packet accordingly.
@@ -38,12 +38,12 @@ class GServer constructor(
         get() = channels.values
 
     companion object {
+        //The [CompletionHandler]
+        private object AcceptHandler : ContinuationCompletionHandler<AsynchronousSocketChannel>()
         private fun uuidPacket(uuid: UUID) = packetBuilder(INTERNAL_OPCODE) {
             writeByte(HANDSHAKE_SUB_IDENTIFIER)
             writeUUID(uuid)
         }
-
-        private object AcceptHandler : ContinuationCompletionHandler<AsynchronousSocketChannel>()
     }
 
 
@@ -88,10 +88,8 @@ class GServer constructor(
     }
 
 
-    override suspend fun close() {
+    override suspend fun initClose() {
         clients.forEach(::close)
-        socketChannel.close()
-        cancelCoroutines()
     }
 
     private fun close(client: IClient) {

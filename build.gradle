@@ -1,9 +1,12 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.17"
+        classpath "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
+        classpath 'com.gitlab.Avelyn:Architecture:1.0.0'
     }
 }
 
@@ -43,10 +46,10 @@ compileKotlin {
 dokka {
     outputFormat = 'html'
     outputDirectory = file("/Output/javadoc")
+    jdkVersion=8
     sourceRoot {
         // Path to source root
-        path = "src/main/kotlin"
-        // See platforms section of documentation
+        path = project.file("src/main/kotlin").absolutePath
         platforms = ["JVM"]
     }
 }

@@ -1,46 +1,24 @@
 package com.github.yona168.giraffe.net.messenger.client
 
-import com.github.yona168.giraffe.net.connect.SuspendCloseable
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
+import com.github.yona168.giraffe.net.packet.SendablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
 
 /**
- * Defines the basic functionality of a client.
+ * Defines the basic functionality of a client. Giraffe implements this with [GClient].
  *
  */
-interface IClient : Writable, Toggleable, SuspendCloseable, CanProcessPackets, CoroutineScope {
+interface IClient : Writable, Toggleable, CanProcessPackets, CoroutineScope {
 
+    /**
+     * The [UUID] given to the client by some server that it connects to. This allows for clients to easily target
+     * other clients by referencing their session UUID in a [SendablePacket]. This is null if the server has not told
+     * the client its UUID
+     */
     val sessionUUID: UUID?
-
-    /**
-     * Tells the client to execute [func] BEFORE it enables and connects, using this
-     * [IClient] as a passed argument to that function.
-     *
-     * @param[func] the function to execute on connect
-     * @return true if this process was successfully registered
-     */
-    fun preEnable(func: (IClient) -> Unit): Boolean
-
-    /**
-     * Tells the client to execute [func] prior to disconnecting from the server, using this
-     * [IClient] as a passed argument to that function.
-     *
-     * @param[func] the function to execute on disconnect
-     * @return true if this process was successfully registered
-     */
-    fun preDisconnect(func: (IClient) -> Unit): Boolean
-
-    /**
-     * Tells the client to execute [func] after disconnecting from the server, using
-     * the closed [IClient] as a passed argument to that function
-     *
-     * @param[func] the function to execute post disconnect
-     * @return true if this process was successfully registered
-     */
-    fun postDisconnect(func: (IClient) -> Unit): Boolean
 
     /**
      * Tells the client to execute this [func] when it receives a packet,

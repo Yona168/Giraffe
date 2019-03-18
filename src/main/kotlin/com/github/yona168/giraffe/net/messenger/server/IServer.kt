@@ -1,11 +1,10 @@
 package com.github.yona168.giraffe.net.messenger.server
 
-import com.github.yona168.giraffe.net.connect.SuspendCloseable
+import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.client.IClient
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
-import com.github.yona168.giraffe.net.messenger.Writable
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
 
@@ -13,7 +12,7 @@ import java.util.*
  * The interface used by [GServer]. In Giraffe, a Server is simply a router of [IClient]s-it has no capabilities on its own.
  * As such, the functions defined here simply manage [IClient]s
  */
-interface IServer : Toggleable, SuspendCloseable, CanProcessPackets, CoroutineScope {
+interface IServer : Toggleable, CanProcessPackets, CoroutineScope {
 
     /**
      * A collection of all connected clients

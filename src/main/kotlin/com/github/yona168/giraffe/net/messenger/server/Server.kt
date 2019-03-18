@@ -5,7 +5,7 @@ import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.gitlab.avelyn.architecture.base.Component
 
 /**
- * The base class for a Server (ie [GServer]). This classe's sole purpose is to link to functionalities of
+ * The base class for a Server (ie [GServer]). This class's sole purpose is to link to functionalities of
  * [IServer] with [AbstractScopedPacketChannelComponent], which is necessary due to certain functions in [Component]
  * not being declared in interfaces
  */

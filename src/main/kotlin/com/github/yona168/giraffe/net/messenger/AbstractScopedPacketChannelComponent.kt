@@ -1,47 +1,57 @@
 package com.github.yona168.giraffe.net.messenger
 
-import com.github.yona168.giraffe.net.connect.SuspendCloseable
+import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
+import com.github.yona168.giraffe.net.messenger.server.Server
 import com.github.yona168.giraffe.net.onDisable
+import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.github.yona168.giraffe.net.packet.pool.ReceivablePacketPool
 import com.gitlab.avelyn.architecture.base.Component
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.nio.channels.AsynchronousChannel
-import com.github.yona168.giraffe.net.messenger.client.Client
-import com.github.yona168.giraffe.net.messenger.server.Server
 
 /**
  * This class links a [Component]'s enable/disableHandler features to the jobs launched from
- * a [CoroutineScope]. This is used a base class for [Server] and
- * [Client]
+ * a [CoroutineScope], and adds the pre enable/disable things useful for channel operations.
+ * This is used a base class for [Server] and [Client]
+ *
  */
 abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
     override val packetProcessor: PacketProcessor,
     protected val bufferPool: Pool<ReceivablePacket> = ReceivablePacketPool()
 ) : Component(),
-    CanProcessPackets, SuspendCloseable, CoroutineScope {
-
+    CanProcessPackets, CoroutineScope {
+    private val preEnable: MutableSet<() -> Unit> = mutableSetOf()
+    private val preDisable: MutableSet<() -> Unit> = mutableSetOf()
     abstract val socketChannel: AsynchronousChannel
     val job = Job()
 
     init {
+        onEnable {
+            preEnable.forEach{it()}
+        }
         onDisable {
             runBlocking {
-                close()
+                preDisable.forEach { it() }
+                initClose()
+                if(socketChannel.isOpen){
+                    socketChannel.close()
+                }
+                if(coroutineContext.isActive) {
+                    this.coroutineContext.cancel()
+                }
             }
         }
     }
 
-    protected fun cancelCoroutines() {
-        this.coroutineContext.cancel()
-    }
+    protected abstract suspend fun initClose()
 
+    fun preEnable(func: () -> Unit) = preEnable.add(func)
+
+    fun preDisable(func: () -> Unit) = preDisable.add(func)
 
 }
 
