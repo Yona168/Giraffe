@@ -4,14 +4,16 @@ import java.nio.ByteBuffer
 import java.util.*
 
 interface SendablePacket {
-    fun writeInt(i: Int)
-    fun writeByte(b: Byte)
-    fun writeDouble(d: Double)
-    fun writeLong(l: Long)
-    fun writeShort(s: Short)
-    fun writeBytes(vararg b: Byte)
-    fun writeString(s: String)
-    fun writeUUID(uuid: UUID) {
+    fun writeInt(i: Int): SendablePacket
+    fun writeByte(b: Byte): SendablePacket
+    fun writeDouble(d: Double): SendablePacket
+    fun writeLong(l: Long): SendablePacket
+    fun writeShort(s: Short): SendablePacket
+    fun writeBytes(vararg b: Byte): SendablePacket
+    fun writeString(s: String): SendablePacket
+
+    @JvmDefault
+    fun writeUUID(uuid: UUID) = this.apply {
         writeLong(uuid.mostSignificantBits)
         writeLong(uuid.leastSignificantBits)
     }
