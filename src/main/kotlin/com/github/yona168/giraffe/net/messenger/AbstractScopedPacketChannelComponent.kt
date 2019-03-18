@@ -1,13 +1,17 @@
 package com.github.yona168.giraffe.net.messenger
 
+import com.github.yona168.giraffe.net.connect.SuspendCloseable
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
-import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
+import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.onDisable
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.github.yona168.giraffe.net.packet.pool.ReceivablePacketPool
 import com.gitlab.avelyn.architecture.base.Component
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
 import java.nio.channels.AsynchronousChannel
 
 /**
@@ -15,44 +19,28 @@ import java.nio.channels.AsynchronousChannel
  * a [CoroutineScope]. This is used a base class for [com.github.yona168.giraffe.net.messenger.server.GServer] and
  * [com.github.yona168.giraffe.net.messenger.client.GClient]
  */
-@ExperimentalCoroutinesApi
 abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
-    override val packetProcessor: ScopedPacketProcessor,
+    override val packetProcessor: PacketProcessor,
     protected val bufferPool: Pool<ReceivablePacket> = ReceivablePacketPool()
-
 ) : Component(),
-    CanProcessPackets, CoroutineScope {
+    CanProcessPackets, SuspendCloseable, CoroutineScope {
 
-    protected abstract val socketChannel: AsynchronousChannel
+    abstract val socketChannel: AsynchronousChannel
     val job = Job()
-    private val preDisconnectListeners: MutableSet<() -> Unit> = mutableSetOf()
-    private val postDisconnectListeners: MutableSet<() -> Unit> = mutableSetOf()
+
     init {
-        addChild(packetProcessor)
         onDisable {
             runBlocking {
-                preDisconnectListeners.forEach { it() }
-                prepareShutdown()
-                packetProcessor.coroutineContext.cancelChildren()
-                packetProcessor.coroutineContext.cancel()
-                this@AbstractScopedPacketChannelComponent.coroutineContext.cancelChildren()
-                this@AbstractScopedPacketChannelComponent.coroutineContext.cancel()
-                job.cancelChildren()
-                try {
-                    job.cancelAndJoin()
-                } finally {
-                }
-                initShutdown()
-                postDisconnectListeners.forEach { it() }
+                close()
             }
         }
     }
 
-    protected abstract suspend fun prepareShutdown()
-    protected abstract suspend fun initShutdown()
+    protected fun cancelCoroutines() {
+        this.coroutineContext.cancel()
+    }
 
-    fun prepareShutdown(func: () -> Unit) = preDisconnectListeners.add(func)
-    fun postShutdown(func: () -> Unit) = postDisconnectListeners.add(func)
+
 }
 
 

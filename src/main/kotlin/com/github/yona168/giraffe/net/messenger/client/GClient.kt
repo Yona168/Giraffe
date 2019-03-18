@@ -1,11 +1,11 @@
 package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.*
-import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
-import com.github.yona168.giraffe.net.packet.*
+import com.github.yona168.giraffe.net.packet.HANDSHAKE_SUB_IDENTIFIER
+import com.github.yona168.giraffe.net.packet.INTERNAL_OPCODE
+import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.net.SocketAddress
@@ -18,22 +18,23 @@ import kotlin.coroutines.CoroutineContext
 /**
  * The basic implementation of
  */
-@ExperimentalCoroutinesApi
+
 class GClient constructor(
     address: SocketAddress?,
-    packetProcessor: ScopedPacketProcessor,
-    override val socketChannel: AsynchronousSocketChannel
-) : AbstractScopedPacketChannelComponent(packetProcessor),
-    Client {
-
+    override val packetProcessor: ScopedPacketProcessor,
+    override val socketChannel: AsynchronousSocketChannel,
+    private val closer: ((IClient) -> Unit)?
+) : Client(packetProcessor) {
     constructor(
         socketChannel: AsynchronousSocketChannel,
         packetProcessor: ScopedPacketProcessor,
-        sessionUUID: UUID
+        sessionUUID: UUID,
+        closer: ((IClient) -> Unit)?
     ) : this(
         address = null,
         packetProcessor = packetProcessor,
-        socketChannel = socketChannel
+        socketChannel = socketChannel,
+        closer = closer
     ) {
         backingSessionUUID = sessionUUID
     }
@@ -41,7 +42,8 @@ class GClient constructor(
     constructor(address: SocketAddress, packetProcessor: ScopedPacketProcessor) : this(
         address = address,
         packetProcessor = packetProcessor,
-        socketChannel = AsynchronousSocketChannel.open()
+        socketChannel = AsynchronousSocketChannel.open(),
+        closer = null
     )
 
     override val coroutineContext: CoroutineContext
@@ -50,36 +52,72 @@ class GClient constructor(
     private val inbox = ByteBuffer.allocate(MAX_PACKET_BYTE_SIZE)
     private val controller = Mutex()
 
-    private object ReadCompletionHandler : ContinuationCompletionHandler<Int>()
-    private object WriteCompletionHandler : ContinuationCompletionHandler<Int>()
+    private lateinit var readWriteHandler: ContinuationCompletionHandler<Int>
 
-    private val onConnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
-    private val onDisconnectListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
-    private val onPacketReceiveListeners: MutableSet<(Client) -> Unit> = mutableSetOf()
-    private val onHandshakeListeners: MutableSet<() -> Unit> = mutableSetOf()
+    private val preEnable: MutableSet<(IClient) -> Unit> = mutableSetOf()
+    private val preDisconnectListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
+    private val postDisconnectListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
+    private val onPacketReceiveListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
+    private val onHandshakeListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
     private val identifier = UUID.randomUUID()
-    private val confirmShutdownChannel = Channel<Unit>()
     private var backingSessionUUID: UUID? = null
     override val sessionUUID: UUID?
         get() = backingSessionUUID
+    private var side: com.github.yona168.giraffe.net.messenger.client.Side? = null
 
-    init {
-        onEnable {
-            if (!(socketChannel.isOpen && socketChannel.remoteAddress != null)) {
-                Objects.requireNonNull(address)
-                connect(address as SocketAddress)
-            }
-            packetProcessor.reigster(INTERNAL_OPCODE) { packet, client ->
-                val opcode = packet.readByte()
-                when (opcode) {
-                    HANDSHAKE_SUB_IDENTIFIER -> {
-                        backingSessionUUID = packet.readUUID()
-                        onHandshakeListeners.forEach { it() }
+    companion object {
+        private object ReadWriteHandlerSupplier : (GClient) -> ContinuationCompletionHandler<Int> {
+            override fun invoke(client: GClient): ContinuationCompletionHandler<Int> {
+                if (client.side == null) {
+                    throw IllegalStateException("Client does not have a side!")
+                }
+                return when (client.side as Side) {
+                    Serverside -> object : ContinuationCompletionHandler<Int>() {
+                        override fun failed(exc: Throwable, attachment: CancellableContinuation<Int>) {
+                            runBlocking {
+                                client.disable()
+                            }
+                        }
                     }
-                    ASK_TO_DISCONNECT -> disable()
+
+                    Clientside -> object : ContinuationCompletionHandler<Int>() {
+                        override fun failed(exc: Throwable, attachment: CancellableContinuation<Int>) {
+                            val message = exc.message
+                            message ?: return
+                            if (message.startsWith("The specified network name is no longer available.")) {
+                                runBlocking {
+                                    client.disable()
+                                }
+                            }
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    init {
+        addChild(packetProcessor)
+        onEnable {
+            val notConnected = !(socketChannel.isOpen && socketChannel.remoteAddress != null)
+            side = if (notConnected) Clientside else Serverside
+            readWriteHandler = ReadWriteHandlerSupplier(this)
+            if (side is Clientside) {
+                Objects.requireNonNull(address)
+                connect(address as SocketAddress)
+                packetProcessor.reigster(INTERNAL_OPCODE) { packet, _ ->
+                    val opcode = packet.readByte()
+                    when (opcode) {
+                        HANDSHAKE_SUB_IDENTIFIER -> {
+                            backingSessionUUID = packet.readUUID()
+                            onHandshakeListeners.forEach { it(this) }
+                        }
+                    }
+                }
+
+            }
             loopRead()
+            preEnable.forEach { it(this) }
         }
     }
 
@@ -88,12 +126,7 @@ class GClient constructor(
         unit: TimeUnit,
         timeout: Long
     ) {
-        val connectionResult = runCatching<GClient> {
             socketChannel.connect(address).get(timeout, unit)
-            this
-        }
-        connectionResult.onSuccess { onConnectListeners.forEach { it(this) } }
-        connectionResult.onFailure { exc -> throw exc }
     }
 
     fun connect(address: SocketAddress): GClient {
@@ -101,29 +134,25 @@ class GClient constructor(
         return this
     }
 
-    override fun write(packet: SendablePacket) {
-        launch(coroutineContext) {
-            controller.withLock {
-                val buf = packet.build()
-                while (buf.hasRemaining()) {
-                    aWrite(buf)
-                }
+    override fun write(packet: SendablePacket) = launch(coroutineContext) {
+        controller.withLock {
+            val buf = packet.build()
+            while (buf.hasRemaining()) {
+                aWrite(buf)
             }
         }
     }
 
-    override fun onConnect(func: (Client) -> Unit) = onConnectListeners.add(func)
-    override fun onConnect(func: () -> Unit) = onConnect { _: Client -> func() }
 
-    override fun onDisconnect(func: (Client) -> Unit) = onDisconnectListeners.add(func)
-    override fun onDisconnect(func: () -> Unit) = onDisconnect { _: Client -> func() }
+    override fun preEnable(func: (IClient) -> Unit) = preEnable.add(func)
 
-    override fun onPacketReceive(func: (Client) -> Unit) = onPacketReceiveListeners.add(func)
-    override fun onPacketReceive(func: () -> Unit) = onPacketReceive { _: Client -> func() }
+    override fun preDisconnect(func: (IClient) -> Unit) = preDisconnectListeners.add(func)
 
-    fun onHandshake(func: () -> Unit): Boolean {
-        return onHandshakeListeners.add(func)
-    }
+    override fun postDisconnect(func: (IClient) -> Unit) = postDisconnectListeners.add(func)
+
+    override fun onPacketReceive(func: (IClient) -> Unit) = onPacketReceiveListeners.add(func)
+
+    override fun onHandshake(func: (IClient) -> Unit) = onHandshakeListeners.add(func)
 
 
     private suspend fun read(): Int {
@@ -140,11 +169,11 @@ class GClient constructor(
     }
 
     private suspend fun read(buf: ByteBuffer): Int = suspendCancellableCoroutine { cont ->
-        socketChannel.read(buf, cont, ReadCompletionHandler)
+        socketChannel.read(buf, cont, readWriteHandler)
     }
 
     private suspend fun aWrite(buf: ByteBuffer): Int = suspendCancellableCoroutine {
-        socketChannel.write(buf, it, WriteCompletionHandler)
+        socketChannel.write(buf, it, readWriteHandler)
     }
 
 
@@ -152,7 +181,7 @@ class GClient constructor(
         var opcode: Opcode? = null
         var size = OPCODE_AND_SIZE_BYTE_SIZE
         var currentRead = 0
-        while (true) {
+        while (isActive) {
             while (currentRead < size) {
                 currentRead += read()
             }
@@ -187,24 +216,31 @@ class GClient constructor(
         }
     }
 
-    override suspend fun prepareShutdown() {
+    override suspend fun close() {
+        preDisconnectListeners.forEach { it(this) }
+        closer?.invoke(this)
         Objects.requireNonNull(sessionUUID)
-        write(disconnectRequest(sessionUUID as UUID))
+        if (socketChannel.isOpen) {
+            socketChannel.close()
+        }
+        cancelCoroutines()
+        postDisconnectListeners.forEach { it(this) }
     }
-
-    override suspend fun initShutdown() {
-        socketChannel.shutdownInput()
-        socketChannel.shutdownOutput()
-        socketChannel.close()
-    }
-
 
     private fun ByteBuffer.getOpcode() = get()
     private fun ByteBuffer.getSize() = int
 
     override fun hashCode() = identifier.hashCode()
 
-    override fun equals(other: Any?) = other is GClient && identifier == other.identifier
+    override fun equals(other: Any?): Boolean {
+        if (other is GClient && identifier == other.identifier) {
+            if (this.sessionUUID != null && other.sessionUUID != null) {
+                return sessionUUID == other.sessionUUID
+            }
+            return true
+        }
+        return false
+    }
 }
 
 

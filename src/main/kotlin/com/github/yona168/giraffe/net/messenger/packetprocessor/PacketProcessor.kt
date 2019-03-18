@@ -5,8 +5,9 @@ import com.github.yona168.giraffe.net.PacketHandlerFunction
 import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
+import kotlinx.coroutines.CoroutineScope
 
-interface PacketProcessor : Toggleable {
+interface PacketProcessor : Toggleable, CoroutineScope {
     fun reigster(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction?
     fun disableHandler(opcode: Opcode): PacketHandlerFunction?
     suspend fun handlePacket(opcode: Opcode, packet: ReceivablePacket, networker: Writable)

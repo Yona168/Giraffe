@@ -1,13 +1,11 @@
 package com.github.yona168.giraffe.net.messenger.packetprocessor
 
 import com.github.yona168.giraffe.net.onEnable
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.newFixedThreadPoolContext
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
-@ExperimentalCoroutinesApi
+
 open class FixedThreadPoolPacketProcessor(numThreads: Int) : ScopedPacketProcessor() {
     override lateinit var coroutineContext: CoroutineContext
 
