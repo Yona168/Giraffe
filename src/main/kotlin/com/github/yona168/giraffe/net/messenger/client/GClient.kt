@@ -2,8 +2,6 @@ package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.*
 import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
-import com.github.yona168.giraffe.net.packet.HANDSHAKE_SUB_IDENTIFIER
-import com.github.yona168.giraffe.net.packet.INTERNAL_OPCODE
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -105,7 +103,7 @@ class GClient constructor(
             if (side is Clientside) {
                 Objects.requireNonNull(address)
                 connect(address as SocketAddress)
-                packetProcessor.reigster(INTERNAL_OPCODE) { packet, _ ->
+                packetProcessor.on(INTERNAL_OPCODE) { packet, _ ->
                     val opcode = packet.readByte()
                     when (opcode) {
                         HANDSHAKE_SUB_IDENTIFIER -> {
@@ -202,7 +200,7 @@ class GClient constructor(
                 onPacketReceiveListeners.forEach { it(this@GClient) }
                 val setOpcode = opcode
                 launch(coroutineContext) {
-                    packetProcessor.handlePacket(
+                    packetProcessor.handle(
                         setOpcode,
                         buffer,
                         this@GClient

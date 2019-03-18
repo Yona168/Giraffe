@@ -8,8 +8,8 @@ import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
 
 interface PacketProcessor : Toggleable, CoroutineScope {
-    fun reigster(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction?
+    fun on(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction?
     fun disableHandler(opcode: Opcode): PacketHandlerFunction?
-    suspend fun handlePacket(opcode: Opcode, packet: ReceivablePacket, networker: Writable)
+    suspend fun handle(opcode: Opcode, packet: ReceivablePacket, networker: Writable)
 
 }

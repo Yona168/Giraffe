@@ -24,5 +24,8 @@ internal open class ContinuationCompletionHandler<T>: CompletionHandler<T, Cance
     }
 
 }
+const val INTERNAL_OPCODE: Opcode = -1
 
+//Client bound
+const val HANDSHAKE_SUB_IDENTIFIER: Opcode = 0
 const val OPCODE_AND_SIZE_BYTE_SIZE: Int = Opcode.SIZE_BYTES + Size.SIZE_BYTES

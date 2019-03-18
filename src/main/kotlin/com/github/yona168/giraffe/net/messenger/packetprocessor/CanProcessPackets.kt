@@ -9,9 +9,9 @@ import java.util.function.BiConsumer
 interface CanProcessPackets {
     val packetProcessor: PacketProcessor
     suspend fun handlePacket(opcode: Opcode, packet: ReceivablePacket, networker: Writable) =
-        packetProcessor.handlePacket(opcode, packet, networker)
+        packetProcessor.handle(opcode, packet, networker)
 
-    fun register(opcode: Opcode, func: PacketHandlerFunction) = packetProcessor.reigster(opcode, func)
+    fun register(opcode: Opcode, func: PacketHandlerFunction) = packetProcessor.on(opcode, func)
     fun register(opcode: Opcode, func: BiConsumer<ReceivablePacket, Writable>) =
         register(opcode) { packet, writable -> func.accept(packet, writable) }
 

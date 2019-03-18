@@ -22,7 +22,7 @@ abstract class ScopedPacketProcessor : PacketProcessor, Component() {
 
     private val handlerMap = mutableMapOf<Opcode, PacketHandlerFunction>()
 
-    override suspend fun handlePacket(opcode: Opcode, packet: ReceivablePacket, networker: Writable) {
+    override suspend fun handle(opcode: Opcode, packet: ReceivablePacket, networker: Writable) {
         withContext(coroutineContext) {
             handleByMap(opcode, packet, networker)
         }
@@ -32,7 +32,7 @@ abstract class ScopedPacketProcessor : PacketProcessor, Component() {
         handlerMap[opcode]?.invoke(packet, networker)
     }
 
-    override fun reigster(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction? {
+    override fun on(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction? {
         return handlerMap.put(opcode, func)
     }
 

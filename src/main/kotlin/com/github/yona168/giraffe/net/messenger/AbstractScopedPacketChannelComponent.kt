@@ -13,11 +13,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import java.nio.channels.AsynchronousChannel
+import com.github.yona168.giraffe.net.messenger.client.Client
+import com.github.yona168.giraffe.net.messenger.server.Server
 
 /**
- * This class links a [Component]'s enable/disable features to the jobs launched from
- * a [CoroutineScope]. This is used a base class for [com.github.yona168.giraffe.net.messenger.server.GServer] and
- * [com.github.yona168.giraffe.net.messenger.client.GClient]
+ * This class links a [Component]'s enable/disableHandler features to the jobs launched from
+ * a [CoroutineScope]. This is used a base class for [Server] and
+ * [Client]
  */
 abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
     override val packetProcessor: PacketProcessor,
