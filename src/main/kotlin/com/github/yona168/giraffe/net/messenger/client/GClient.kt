@@ -19,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 
 class GClient constructor(
     address: SocketAddress?,
-    override val packetProcessor: ScopedPacketProcessor,
+    packetProcessor: ScopedPacketProcessor,
     override val socketChannel: AsynchronousSocketChannel,
     private val closer: ((IClient) -> Unit)?
 ) : Client(packetProcessor) {
@@ -93,7 +93,6 @@ class GClient constructor(
     }
 
     init {
-        addChild(packetProcessor)
         onEnable {
             val notConnected = !(socketChannel.isOpen && socketChannel.remoteAddress != null)
             side = if (notConnected) Side.Clientside else Side.Serverside
@@ -121,7 +120,7 @@ class GClient constructor(
         unit: TimeUnit,
         timeout: Long
     ) {
-            socketChannel.connect(address).get(timeout, unit)
+        socketChannel.connect(address).get(timeout, unit)
     }
 
     fun connect(address: SocketAddress): GClient {
@@ -137,7 +136,6 @@ class GClient constructor(
             }
         }
     }
-
 
 
     override fun onPacketReceive(func: (IClient) -> Unit) = onPacketReceiveListeners.add(func)
@@ -208,6 +206,9 @@ class GClient constructor(
 
     override suspend fun initClose() {
         closer?.invoke(this)
+        if (this.side is Side.Clientside) {
+            packetProcessor.disable()
+        }
     }
 
     private fun ByteBuffer.getOpcode() = get()

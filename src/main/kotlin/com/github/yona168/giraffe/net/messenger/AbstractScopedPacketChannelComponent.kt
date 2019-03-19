@@ -10,7 +10,10 @@ import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.github.yona168.giraffe.net.packet.pool.ReceivablePacketPool
 import com.gitlab.avelyn.architecture.base.Component
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
 import java.nio.channels.AsynchronousChannel
 
 /**
@@ -31,18 +34,18 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
 
     init {
         onEnable {
-            preEnable.forEach{it()}
+            preEnable.forEach { it() }
+            packetProcessor.enable()
         }
         onDisable {
             runBlocking {
                 preDisable.forEach { it() }
                 initClose()
-                if(socketChannel.isOpen){
+                this@AbstractScopedPacketChannelComponent.coroutineContext.cancel()
+                if (socketChannel.isOpen) {
                     socketChannel.close()
                 }
-                if(coroutineContext.isActive) {
-                    this.coroutineContext.cancel()
-                }
+                println("Hello")
             }
         }
     }

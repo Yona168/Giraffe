@@ -11,5 +11,5 @@ import com.gitlab.avelyn.architecture.base.Component
  * [IClient] with [AbstractScopedPacketChannelComponent], which is necessary due to certain functions in [Component]
  * not being declared in interfaces
  */
-abstract class Client(override val packetProcessor: PacketProcessor) :
+abstract class Client(packetProcessor: PacketProcessor) :
     AbstractScopedPacketChannelComponent(packetProcessor), IClient

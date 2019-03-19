@@ -27,8 +27,8 @@ import kotlin.coroutines.CoroutineContext
  */
 class GServer constructor(
     address: SocketAddress,
-    override val packetProcessor: ScopedPacketProcessor
-) : AbstractScopedPacketChannelComponent(packetProcessor), IServer {
+    packetProcessor: ScopedPacketProcessor
+) : Server(packetProcessor) {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
@@ -48,7 +48,6 @@ class GServer constructor(
 
 
     init {
-        addChild(packetProcessor)
         onEnable {
             socketChannel = AsynchronousServerSocketChannel.open().bind(address)
             launch(coroutineContext) {
@@ -89,6 +88,7 @@ class GServer constructor(
 
 
     override suspend fun initClose() {
+        packetProcessor.disable()
         clients.forEach(::close)
     }
 
