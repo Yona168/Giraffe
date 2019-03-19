@@ -171,7 +171,7 @@ class GClient constructor(
         var opcode: Opcode? = null
         var size = OPCODE_AND_SIZE_BYTE_SIZE
         var currentRead = 0
-        while (isActive) {
+        while (this@GClient.isActive) {
             while (currentRead < size) {
                 currentRead += read()
             }
