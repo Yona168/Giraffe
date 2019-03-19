@@ -11,6 +11,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousSocketChannel
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.function.BiConsumer
 import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
@@ -101,7 +102,7 @@ class GClient constructor(
             if (side is Side.Clientside) {
                 Objects.requireNonNull(address)
                 connect(address as SocketAddress)
-                packetProcessor.on(INTERNAL_OPCODE) { packet, _ ->
+                packetProcessor.on(INTERNAL_OPCODE, BiConsumer { packet, _ ->
                     val opcode = packet.readByte()
                     when (opcode) {
                         HANDSHAKE_SUB_IDENTIFIER -> {
@@ -109,7 +110,7 @@ class GClient constructor(
                             onHandshakeListeners.forEach { it.accept(this) }
                         }
                     }
-                }
+                })
 
             }
             loopRead()
