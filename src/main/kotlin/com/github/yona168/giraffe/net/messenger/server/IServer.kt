@@ -7,6 +7,7 @@ import com.github.yona168.giraffe.net.packet.SendablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
+import java.util.function.Consumer
 
 /**
  * The interface used by [GServer]. In Giraffe, a Server is simply a router of [IClient]s-it has no capabilities on its own.
@@ -19,6 +20,7 @@ interface IServer : Toggleable, CanProcessPackets, CoroutineScope {
      */
     val clients: Collection<IClient>
 
+    fun onConnect(func: Consumer<IClient>): Boolean
     /**
      * Closes a client server-side. This calls [IClient.close].
      * @param [uuid] The session [UUID] of the client, as referenced with [IClient.sessionUUID]

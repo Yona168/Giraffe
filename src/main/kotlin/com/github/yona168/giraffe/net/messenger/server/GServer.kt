@@ -17,6 +17,7 @@ import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -30,6 +31,7 @@ class GServer constructor(
     packetProcessor: PacketProcessor
 ) : Server(packetProcessor) {
 
+    private val onConnects = mutableSetOf<Consumer<IClient>>()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
     private val channels: MutableMap<UUID, IClient> = ConcurrentHashMap()
@@ -40,6 +42,7 @@ class GServer constructor(
     companion object {
         //The [CompletionHandler]
         private object AcceptHandler : ContinuationCompletionHandler<AsynchronousSocketChannel>()
+
         private fun uuidPacket(uuid: UUID) = packetBuilder(INTERNAL_OPCODE) {
             writeByte(HANDSHAKE_SUB_IDENTIFIER)
             writeUUID(uuid)
@@ -60,6 +63,7 @@ class GServer constructor(
                     channels[uuid] = client
                     client.enable()
                     client.write(uuidPacket(uuid))
+                    onConnects.forEach { it.accept(client) }
                     yield()
                 }
             }
@@ -72,6 +76,7 @@ class GServer constructor(
             socketChannel.accept(cont, AcceptHandler)
         }
 
+    override fun onConnect(func: Consumer<IClient>) = onConnects.add(func)
 
     override fun closeClient(uuid: UUID) {
         channels[uuid]?.apply { close(this) }
