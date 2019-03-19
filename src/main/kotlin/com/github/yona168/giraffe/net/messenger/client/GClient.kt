@@ -1,7 +1,7 @@
 package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.*
-import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
+import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -19,13 +19,13 @@ import kotlin.coroutines.CoroutineContext
 
 class GClient constructor(
     address: SocketAddress?,
-    packetProcessor: ScopedPacketProcessor,
+    packetProcessor: PacketProcessor,
     override val socketChannel: AsynchronousSocketChannel,
     private val closer: ((IClient) -> Unit)?
 ) : Client(packetProcessor) {
     constructor(
         socketChannel: AsynchronousSocketChannel,
-        packetProcessor: ScopedPacketProcessor,
+        packetProcessor: PacketProcessor,
         sessionUUID: UUID,
         closer: ((IClient) -> Unit)?
     ) : this(
@@ -37,7 +37,7 @@ class GClient constructor(
         backingSessionUUID = sessionUUID
     }
 
-    constructor(address: SocketAddress, packetProcessor: ScopedPacketProcessor) : this(
+    constructor(address: SocketAddress, packetProcessor: PacketProcessor) : this(
         address = address,
         packetProcessor = packetProcessor,
         socketChannel = AsynchronousSocketChannel.open(),

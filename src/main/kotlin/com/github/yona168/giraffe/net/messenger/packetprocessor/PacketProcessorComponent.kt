@@ -11,7 +11,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 
 
-abstract class ScopedPacketProcessor : PacketProcessor, Component() {
+abstract class PacketProcessorComponent : PacketProcessor, Component() {
     val job = Job()
 
     init {

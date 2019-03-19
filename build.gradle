@@ -5,8 +5,6 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.17"
-        classpath "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
-        classpath 'com.gitlab.Avelyn:Architecture:1.0.0'
     }
 }
 
@@ -51,6 +49,9 @@ dokka {
         // Path to source root
         path = project.file("src/main/kotlin").absolutePath
         platforms = ["JVM"]
+        externalDocumentationLink{
+            url=new URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/")
+        }
     }
 }
 

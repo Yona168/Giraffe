@@ -7,7 +7,7 @@ import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelCompo
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.client.GClient
 import com.github.yona168.giraffe.net.messenger.client.IClient
-import com.github.yona168.giraffe.net.messenger.packetprocessor.ScopedPacketProcessor
+import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import com.github.yona168.giraffe.net.packet.packetBuilder
@@ -27,7 +27,7 @@ import kotlin.coroutines.CoroutineContext
  */
 class GServer constructor(
     address: SocketAddress,
-    packetProcessor: ScopedPacketProcessor
+    packetProcessor: PacketProcessor
 ) : Server(packetProcessor) {
 
     override val coroutineContext: CoroutineContext

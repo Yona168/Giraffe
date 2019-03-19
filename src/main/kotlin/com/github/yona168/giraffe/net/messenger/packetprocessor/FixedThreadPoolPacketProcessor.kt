@@ -6,7 +6,7 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 
-open class FixedThreadPoolPacketProcessor(numThreads: Int) : ScopedPacketProcessor() {
+open class FixedThreadPoolPacketProcessor(numThreads: Int) : PacketProcessorComponent() {
     override lateinit var coroutineContext: CoroutineContext
 
     init {
