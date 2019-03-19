@@ -11,6 +11,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousSocketChannel
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -53,8 +54,8 @@ class GClient constructor(
     private lateinit var readWriteHandler: ContinuationCompletionHandler<Int>
 
 
-    private val onPacketReceiveListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
-    private val onHandshakeListeners: MutableSet<(IClient) -> Unit> = mutableSetOf()
+    private val onPacketReceiveListeners: MutableSet<Consumer<IClient>> = mutableSetOf()
+    private val onHandshakeListeners: MutableSet<Consumer<IClient>> = mutableSetOf()
     private val identifier = UUID.randomUUID()
     private var backingSessionUUID: UUID? = null
     override val sessionUUID: UUID?
@@ -105,7 +106,7 @@ class GClient constructor(
                     when (opcode) {
                         HANDSHAKE_SUB_IDENTIFIER -> {
                             backingSessionUUID = packet.readUUID()
-                            onHandshakeListeners.forEach { it(this) }
+                            onHandshakeListeners.forEach { it.accept(this) }
                         }
                     }
                 }
@@ -138,9 +139,9 @@ class GClient constructor(
     }
 
 
-    override fun onPacketReceive(func: (IClient) -> Unit) = onPacketReceiveListeners.add(func)
+    override fun onPacketReceive(func: Consumer<IClient>) = onPacketReceiveListeners.add(func)
 
-    override fun onHandshake(func: (IClient) -> Unit) = onHandshakeListeners.add(func)
+    override fun onHandshake(func: Consumer<IClient>) = onHandshakeListeners.add(func)
 
 
     private suspend fun read(): Int {
@@ -187,7 +188,7 @@ class GClient constructor(
                     buffer.put(inbox.get())
                 }
                 buffer.flip()
-                onPacketReceiveListeners.forEach { it(this@GClient) }
+                onPacketReceiveListeners.forEach { it.accept(this@GClient) }
                 val setOpcode = opcode
                 launch(coroutineContext) {
                     packetProcessor.handle(

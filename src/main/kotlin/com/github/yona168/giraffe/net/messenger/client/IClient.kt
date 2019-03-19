@@ -6,6 +6,7 @@ import com.github.yona168.giraffe.net.packet.SendablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
+import java.util.function.Consumer
 
 /**
  * Defines the basic functionality of a client. Giraffe implements this with [GClient].
@@ -29,9 +30,9 @@ interface IClient : Writable, Toggleable, CanProcessPackets, CoroutineScope {
      *
      * @return true if this process was successfully registered
      */
-    fun onPacketReceive(func: (IClient) -> Unit): Boolean
+    fun onPacketReceive(func: Consumer<IClient>): Boolean
 
-    fun onHandshake(func: (IClient) -> Unit): Boolean
+    fun onHandshake(func: Consumer<IClient>): Boolean
 
 
 }
