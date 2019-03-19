@@ -45,7 +45,6 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
                 if (socketChannel.isOpen) {
                     socketChannel.close()
                 }
-                println("Hello")
             }
         }
     }
