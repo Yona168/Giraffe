@@ -27,19 +27,19 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
     protected val bufferPool: Pool<ReceivablePacket> = ReceivablePacketPool()
 ) : Component(),
     CanProcessPackets, CoroutineScope {
-    private val preEnable: MutableSet<() -> Unit> = mutableSetOf()
-    private val preDisable: MutableSet<() -> Unit> = mutableSetOf()
+    private val preEnable: MutableSet<Runnable> = mutableSetOf()
+    private val preDisable: MutableSet<Runnable> = mutableSetOf()
     abstract val socketChannel: AsynchronousChannel
     val job = Job()
 
     init {
         onEnable {
-            preEnable.forEach { it() }
+            preEnable.forEach(Runnable::run)
             packetProcessor.enable()
         }
         onDisable {
             runBlocking {
-                preDisable.forEach { it() }
+                preDisable.forEach(Runnable::run)
                 initClose()
                 this@AbstractScopedPacketChannelComponent.coroutineContext.cancel()
                 if (socketChannel.isOpen) {
@@ -51,9 +51,9 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
 
     protected abstract suspend fun initClose()
 
-    fun preEnable(func: () -> Unit) = preEnable.add(func)
+    fun preEnable(func: Runnable) = preEnable.add(func)
 
-    fun preDisable(func: () -> Unit) = preDisable.add(func)
+    fun preDisable(func: Runnable) = preDisable.add(func)
 
 }
 
