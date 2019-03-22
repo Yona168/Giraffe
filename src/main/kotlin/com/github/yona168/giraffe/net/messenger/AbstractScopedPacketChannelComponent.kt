@@ -1,9 +1,7 @@
 package com.github.yona168.giraffe.net.messenger
 
-import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
-import com.github.yona168.giraffe.net.messenger.server.Server
 import com.github.yona168.giraffe.net.onDisable
 import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
@@ -54,7 +52,6 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
     fun preEnable(func: Runnable) = preEnable.add(func)
 
     fun preDisable(func: Runnable) = preDisable.add(func)
-
 }
 
 

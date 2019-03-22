@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlin.coroutines.CoroutineContext
 
 
-class CoroutineDispatcherPacketProcessor(dispatcher: CoroutineDispatcher) : PacketProcessorComponent() {
+class CoroutineDispatcherPacketProcessor(dispatcher: CoroutineDispatcher) : MappedPacketProcessor() {
     override lateinit var coroutineContext: CoroutineContext
 
     init {

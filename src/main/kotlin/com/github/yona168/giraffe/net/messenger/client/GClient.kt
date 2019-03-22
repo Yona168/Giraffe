@@ -1,6 +1,7 @@
 package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.*
+import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.*
@@ -23,13 +24,13 @@ class GClient constructor(
     address: SocketAddress?,
     packetProcessor: PacketProcessor,
     override val socketChannel: AsynchronousSocketChannel,
-    private val closer: ((IClient) -> Unit)?
-) : Client(packetProcessor) {
+    private val closer: ((Client) -> Unit)?
+) : AbstractScopedPacketChannelComponent(packetProcessor), Client {
     constructor(
         socketChannel: AsynchronousSocketChannel,
         packetProcessor: PacketProcessor,
         sessionUUID: UUID,
-        closer: ((IClient) -> Unit)?
+        closer: ((Client) -> Unit)?
     ) : this(
         address = null,
         packetProcessor = packetProcessor,
@@ -55,8 +56,8 @@ class GClient constructor(
     private lateinit var readWriteHandler: ContinuationCompletionHandler<Int>
 
 
-    private val onPacketReceiveListeners: MutableSet<Consumer<IClient>> = mutableSetOf()
-    private val onHandshakeListeners: MutableSet<Consumer<IClient>> = mutableSetOf()
+    private val onPacketReceiveListeners: MutableSet<Consumer<Client>> = mutableSetOf()
+    private val onHandshakeListeners: MutableSet<Consumer<Client>> = mutableSetOf()
     private val identifier = UUID.randomUUID()
     private var backingSessionUUID: UUID? = null
     override val sessionUUID: UUID?
@@ -140,10 +141,12 @@ class GClient constructor(
     }
 
 
-    override fun onPacketReceive(func: Consumer<IClient>) = onPacketReceiveListeners.add(func)
+    override fun onPacketReceive(func: Consumer<Client>) = onPacketReceiveListeners.add(func)
 
-    override fun onHandshake(func: Consumer<IClient>) = onHandshakeListeners.add(func)
+    override fun onHandshake(func: Consumer<Client>) = onHandshakeListeners.add(func)
 
+    override fun onEnable(vararg listeners: Runnable) = this.apply { super.onEnable(*listeners) }
+    override fun onDisable(vararg listeners: Runnable) = this.apply { super.onDisable(*listeners) }
 
     private suspend fun read(): Int {
         val read = withContext(coroutineContext) {

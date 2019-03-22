@@ -1,15 +1,38 @@
 package com.github.yona168.giraffe.net.messenger.client
 
-import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
-import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
-import com.github.yona168.giraffe.net.messenger.server.GServer
-import com.github.yona168.giraffe.net.messenger.server.IServer
-import com.gitlab.avelyn.architecture.base.Component
+import com.github.yona168.giraffe.net.messenger.Toggled
+import com.github.yona168.giraffe.net.messenger.Writable
+import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
+import com.github.yona168.giraffe.net.packet.SendablePacket
+import kotlinx.coroutines.CoroutineScope
+import java.util.*
+import java.util.function.Consumer
 
 /**
- * The base class for a Client (ie [GClient]. This class's sole purpose is to link to functionalities of
- * [IClient] with [AbstractScopedPacketChannelComponent], which is necessary due to certain functions in [Component]
- * not being declared in interfaces
+ * Defines the basic functionality of a client. Giraffe implements this with [GClient].
+ *
  */
-abstract class Client(packetProcessor: PacketProcessor) :
-    AbstractScopedPacketChannelComponent(packetProcessor), IClient
+interface Client : Writable, Toggled, CanProcessPackets, CoroutineScope {
+
+    /**
+     * The [UUID] given to the client by some server that it connects to. This allows for clients to easily target
+     * other clients by referencing their session UUID in a [SendablePacket]. This is null if the server has not told
+     * the client its UUID
+     */
+    val sessionUUID: UUID?
+
+    /**
+     * Tells the client to execute this [func] when it receives a packet,
+     * regardless of what packet that is. This [Client] is passed as an argument
+     * to that function.
+     *
+     * @param[func] The function to execute when a packet is received
+     *
+     * @return true if this process was successfully registered
+     */
+    fun onPacketReceive(func: Consumer<Client>): Boolean
+
+    fun onHandshake(func: Consumer<Client>): Boolean
+
+
+}
