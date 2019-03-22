@@ -26,12 +26,19 @@ interface Client : Writable, Toggled, CanProcessPackets, CoroutineScope {
      * regardless of what packet that is. This [Client] is passed as an argument
      * to that function.
      *
-     * @param[func] The function to execute when a packet is received
-     *
+     * @param[func] The function to execute when a packet is received, prior to processing it
      * @return true if this process was successfully registered
      */
     fun onPacketReceive(func: Consumer<Client>): Boolean
 
+    /**
+     * Tells the client to execute this [func] when it receives a specified handshake packet from the server. This
+     * means that packet sending across the socket channel is working, and thus this method is the earliest, safest method
+     * for sending packets from.
+     *
+     * @param[func] the function to execute when a specified handshake packet is received.
+     * @return true if this process was successfully registered
+     */
     fun onHandshake(func: Consumer<Client>): Boolean
 
 

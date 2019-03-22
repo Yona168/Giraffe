@@ -3,7 +3,10 @@ package com.github.yona168.giraffe.net.messenger.client
 import com.github.yona168.giraffe.net.*
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
+import com.github.yona168.giraffe.net.messenger.server.Server
 import com.github.yona168.giraffe.net.packet.SendablePacket
+import com.gitlab.avelyn.architecture.base.Component
+import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -17,45 +20,90 @@ import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 /**
- * The basic implementation of
+ * The default implementation of [Client]. For internal packets, this uses the opcode identifier of [INTERNAL_OPCODE].
+ * Thus, NOTHING else should be registered under that opcode. Further, any implementation of [Server] that uses this class
+ * should send a [SendablePacket] made EXACTLY like this one:
+ *
+ *     writeByte(HANDSHAKE_SUB_IDENTIFIER)
+ *     writeUUID(uuidToSend)
+ *
+ * The [UUID] sent will be set to [sessionUUID], thus establishing the same [UUID] by both the Server and Client. Other than
+ * this requirement, this class is fit for use with any [Server] implementation, or truly, even anything above that.
+ *
+ * This implementation uses [Component] for enabling/disabling.
+ *
+ * @param[address] the [SocketAddress] that this Client will connect to when it is enabled with [Toggleable.enable].
+ * @param[packetProcessor] The [PacketProcessor] that will be used to process received packets.
+ * @param[socketChannel] The [AsynchronousSocketChannel] used to send and receive data.
+ *
  */
 
-class GClient constructor(
+class GClient private constructor(
     address: SocketAddress?,
     packetProcessor: PacketProcessor,
-    override val socketChannel: AsynchronousSocketChannel,
-    private val closer: ((Client) -> Unit)?
+    override val socketChannel: AsynchronousSocketChannel
 ) : AbstractScopedPacketChannelComponent(packetProcessor), Client {
-    constructor(
+
+    /**
+     * This class is also used as the [Client] implementation Server-side. Thus, some things
+     * work differently on both ends. This constructor should be used by the [Server] ONLY, as
+     * if this constructor is used, the [socketChannel] is assumed to be connected and will not connect. [sessionUUID]
+     * becomes this object's [sessionUUID]. To make this difference more explicit, this constructor is declared private
+     * and "server-side" clients are instead created through [GClient.serverside]
+     * @param[socketChannel] The [AsynchronousSocketChannel] that is assumed to be already connected somewhere.
+     * @param[packetProcessor] The [PacketProcessor] to be used by this client.
+     * @param[sessionUUID] The [UUID] to be set to [sessionUUID]
+     */
+    private constructor(
         socketChannel: AsynchronousSocketChannel,
         packetProcessor: PacketProcessor,
-        sessionUUID: UUID,
-        closer: ((Client) -> Unit)?
+        sessionUUID: UUID
     ) : this(
         address = null,
         packetProcessor = packetProcessor,
-        socketChannel = socketChannel,
-        closer = closer
+        socketChannel = socketChannel
     ) {
         backingSessionUUID = sessionUUID
     }
 
-    constructor(address: SocketAddress, packetProcessor: PacketProcessor) : this(
+    /**
+     * This constructor creates a "client-side" client, with the channel being automatically opened
+     * and connected to [address] when enabled. This constructor is private to be more explicit, and should
+     * be called through [GClient.clientside]
+     * @param[address] The [SocketAddress] that this client will connect to
+     * @param[packetProcessor] The [PacketProcessor] to be used by this client
+     */
+    private constructor(address: SocketAddress, packetProcessor: PacketProcessor) : this(
         address = address,
         packetProcessor = packetProcessor,
-        socketChannel = AsynchronousSocketChannel.open(),
-        closer = null
+        socketChannel = AsynchronousSocketChannel.open()
     )
 
+    /**
+     * The [CoroutineContext] that this client will use for launching coroutines. In [GClient],
+     * this is set to [Dispatchers.IO]+[job]
+     */
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
+    /**
+     * The [ByteBuffer] that incoming bytes are read into before being separated and processed as separate packets.
+     */
     private val inbox = ByteBuffer.allocate(MAX_PACKET_BYTE_SIZE)
+
+    /**
+     * The [Mutex] that ensures that callers to [GClient.write] are synchronized, so that errors do not occur.
+     */
     private val controller = Mutex()
 
+    /**
+     * The [ContinuationCompletionHandler] that handles reading from and writing to the [socketChannel]
+     */
     private lateinit var readWriteHandler: ContinuationCompletionHandler<Int>
 
-
+    /**
+     * A collection of
+     */
     private val onPacketReceiveListeners: MutableSet<Consumer<Client>> = mutableSetOf()
     private val onHandshakeListeners: MutableSet<Consumer<Client>> = mutableSetOf()
     private val identifier = UUID.randomUUID()
@@ -65,6 +113,11 @@ class GClient constructor(
     private var side: Side? = null
 
     companion object {
+        fun serverside(socketChannel: AsynchronousSocketChannel, packetProcessor: PacketProcessor, sessionUUID: UUID) =
+            GClient(socketChannel, packetProcessor, sessionUUID)
+
+        fun clientside(address: SocketAddress, packetProcessor: PacketProcessor) = GClient(address, packetProcessor)
+
         private object ReadWriteHandlerSupplier : (GClient) -> ContinuationCompletionHandler<Int> {
             override fun invoke(client: GClient): ContinuationCompletionHandler<Int> {
                 if (client.side == null) {
@@ -210,7 +263,6 @@ class GClient constructor(
     }
 
     override suspend fun initClose() {
-        closer?.invoke(this)
         if (this.side is Side.Clientside) {
             packetProcessor.disable()
         }

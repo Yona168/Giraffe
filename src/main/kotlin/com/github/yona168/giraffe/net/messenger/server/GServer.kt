@@ -58,8 +58,8 @@ class GServer constructor(
                     val clientChannel = accept()
                     clientChannel ?: continue
                     val uuid = UUID.randomUUID()
-                    val client: Client =
-                        GClient(clientChannel, packetProcessor, uuid) { client -> channels.remove(client.sessionUUID) }
+                    val client: Client = GClient(clientChannel, packetProcessor, uuid)
+                    client.onDisable(Runnable { channels.remove(client.sessionUUID) })
                     channels[uuid] = client
                     client.enable()
                     client.write(uuidPacket(uuid))
