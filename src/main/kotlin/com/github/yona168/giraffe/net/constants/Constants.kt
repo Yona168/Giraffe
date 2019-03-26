@@ -1,21 +1,22 @@
-package com.github.yona168.giraffe.net
+@file:JvmName("Constants")
 
-import com.github.yona168.giraffe.net.messenger.client.Client
-import com.github.yona168.giraffe.net.packet.ReceivablePacket
+package com.github.yona168.giraffe.net.constants
+
 import kotlinx.coroutines.CancellableContinuation
-import java.nio.ByteBuffer
 import java.nio.channels.CompletionHandler
-import java.util.function.BiConsumer
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+
 const val MAX_PACKET_BYTE_SIZE = 4096
 
-typealias ByteBufferOp = (ByteBuffer).() -> Unit
 typealias Opcode = Byte
 typealias Size = Int
-typealias PacketHandlerFunction = BiConsumer<ReceivablePacket, Client>
-internal open class ContinuationCompletionHandler<T>: CompletionHandler<T, CancellableContinuation<T>> {
+
+/**
+ * A [CompletionHandler] that resumes a [CancellableContinuation] on success, and resumes it with the exception on fail.
+ */
+open class ContinuationCompletionHandler<T> : CompletionHandler<T, CancellableContinuation<T>> {
     override fun completed(result: T, attachment: CancellableContinuation<T>) {
         attachment.resume(result)
     }

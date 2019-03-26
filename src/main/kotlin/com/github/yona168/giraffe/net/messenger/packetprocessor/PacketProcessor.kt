@@ -1,14 +1,13 @@
 package com.github.yona168.giraffe.net.messenger.packetprocessor
 
-import com.github.yona168.giraffe.net.Opcode
-import com.github.yona168.giraffe.net.PacketHandlerFunction
+import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
 
 /**
- * a PacketProcessor is used to process [ReceivablePacket]s.
+ * A PacketProcessor is used to process [ReceivablePacket]s.
  */
 interface PacketProcessor : Toggleable, CoroutineScope {
     /**

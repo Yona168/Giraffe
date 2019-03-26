@@ -6,8 +6,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 
 /**
- * Defines a [PacketProcessor] that extends [Component], giving it enable/disable functionality
+ * Defines a [PacketProcessor] that extends [Component]
+ *
  * @property[job] the [Job] of this component.
+ * On disable, [PacketProcessor.coroutineContext] is cancelled
  */
 abstract class PacketProcessorComponent : PacketProcessor, Component() {
     val job = Job()

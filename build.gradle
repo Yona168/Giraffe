@@ -42,7 +42,7 @@ compileKotlin {
 }
 
 dokka {
-    outputFormat = 'html'
+    outputFormat = 'javadoc'
     outputDirectory = file("/Output/javadoc")
     jdkVersion=8
     sourceRoot {
@@ -55,17 +55,6 @@ dokka {
     }
 }
 
-jar {
-    archiveName = "${project.name}.jar"
-    //destinationDir = file('/Output')
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    manifest {
-        attributes("Main-Class": "com.github.yona168.giraffe.net.TestKt")
-    }
-
-}
 
 
 

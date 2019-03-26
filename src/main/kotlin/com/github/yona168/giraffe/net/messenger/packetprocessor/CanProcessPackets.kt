@@ -1,12 +1,11 @@
 package com.github.yona168.giraffe.net.messenger.packetprocessor
 
-import com.github.yona168.giraffe.net.Opcode
-import com.github.yona168.giraffe.net.PacketHandlerFunction
+import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 
 /**
- * Defines a class that has a [PacketProcessor] as a field
+ * An object that has a [PacketProcessor] as a field
  * @property[packetProcessor] The [PacketProcessor] contained by the implementing class
  * @see[PacketProcessor]
  */

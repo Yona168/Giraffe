@@ -1,8 +1,8 @@
 package com.github.yona168.giraffe.net.messenger.server
 
-import com.github.yona168.giraffe.net.ContinuationCompletionHandler
-import com.github.yona168.giraffe.net.HANDSHAKE_SUB_IDENTIFIER
-import com.github.yona168.giraffe.net.INTERNAL_OPCODE
+import com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler
+import com.github.yona168.giraffe.net.constants.HANDSHAKE_SUB_IDENTIFIER
+import com.github.yona168.giraffe.net.constants.INTERNAL_OPCODE
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.client.GClient
@@ -10,7 +10,6 @@ import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import com.github.yona168.giraffe.net.packet.packetBuilder
-import com.sun.security.ntlm.Server
 import kotlinx.coroutines.*
 import java.net.SocketAddress
 import java.nio.channels.AsynchronousServerSocketChannel
@@ -21,44 +20,48 @@ import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 /**
- * The given implementation for [Server]. This class uses a [MutableMap] to store client [UUID]s to the serverside [Client] objects.
- * It overrides [CoroutineScope.coroutineContext] with [Dispatchers.IO]+[AbstractScopedPacketChannelComponent.job]. After
- * accepting a Client, it writes a handshake packet, giving it a session UUID as referenced by [Client.sessionUUID]. Any
- * [Client] that uses this server should handle the packet accordingly.
+ * The given implementation for [Server]. This class uses a [MutableMap] to store client [UUID]s to the [Client] objects, which represent
+ * server-side connections.
+ *[CoroutineScope.coroutineContext] is overriden with [Dispatchers.IO]+[AbstractScopedPacketChannelComponent.job]. After
+ * accepting a Client, it writes a handshake packet (see [GClient] description), giving it a session UUID as referenced by [Client.sessionUUID]. Any
+ * [Client] that uses this server should handle the packet accordingly, or ignore it.
+ *
+ * @param[address] The [SocketAddress] to have the server run on
+ * @param[packetProcessor] The [PacketProcessor] to process received packets with.
  */
 class GServer constructor(
     address: SocketAddress,
     packetProcessor: PacketProcessor
-) : AbstractScopedPacketChannelComponent(packetProcessor), com.github.yona168.giraffe.net.messenger.server.Server {
-
-    private val onConnects = mutableSetOf<Consumer<Client>>()
+) : AbstractScopedPacketChannelComponent(packetProcessor), Server {
+    /**
+     * The [CoroutineContext] that this client will use for launching coroutines. In [GServer],
+     * this is set to [Dispatchers.IO]+[job]
+     */
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
-    private val channels: MutableMap<UUID, Client> = ConcurrentHashMap()
-    override lateinit var socketChannel: AsynchronousServerSocketChannel
+
+    /**
+     * The [AsynchronousServerSocketChannel] that accepts client connections
+     */
+    override val socketChannel: AsynchronousServerSocketChannel
+        get() = backingSocketChannel
+
+    private lateinit var backingSocketChannel: AsynchronousServerSocketChannel
+
     override val clients: Collection<Client>
         get() = channels.values
-
-    companion object {
-        //The [CompletionHandler]
-        private object AcceptHandler : ContinuationCompletionHandler<AsynchronousSocketChannel>()
-
-        private fun uuidPacket(uuid: UUID) = packetBuilder(INTERNAL_OPCODE, Consumer {
-            it.writeByte(HANDSHAKE_SUB_IDENTIFIER)
-            it.writeUUID(uuid)
-        })
-    }
-
+    private val onConnects = mutableSetOf<Consumer<Client>>()
+    private val channels: MutableMap<UUID, Client> = ConcurrentHashMap()
 
     init {
         onEnable {
-            socketChannel = AsynchronousServerSocketChannel.open().bind(address)
+            backingSocketChannel = AsynchronousServerSocketChannel.open().bind(address)
             launch(coroutineContext) {
                 while (isActive) {
                     val clientChannel = accept()
                     clientChannel ?: continue
                     val uuid = UUID.randomUUID()
-                    val client: Client = GClient(clientChannel, packetProcessor, uuid)
+                    val client: Client = GClient.newServerside(clientChannel, packetProcessor, uuid)
                     client.onDisable(Runnable { channels.remove(client.sessionUUID) })
                     channels[uuid] = client
                     client.enable()
@@ -103,6 +106,21 @@ class GServer constructor(
     private fun close(client: Client) {
         client.sessionUUID?.run(channels::remove)
         client.disable()
+    }
+
+    companion object {
+        /**
+         * The [ContinuationCompletionHandler] to use to accept channels
+         */
+        private object AcceptHandler : ContinuationCompletionHandler<AsynchronousSocketChannel>()
+
+        /**
+         * Supplier for handshake packets
+         */
+        private fun uuidPacket(uuid: UUID) = packetBuilder(INTERNAL_OPCODE, Consumer {
+            it.writeByte(HANDSHAKE_SUB_IDENTIFIER)
+            it.writeUUID(uuid)
+        })
     }
 }
 

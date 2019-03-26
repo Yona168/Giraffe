@@ -2,7 +2,11 @@ package com.github.yona168.giraffe.net.packet
 
 import java.nio.ByteBuffer
 
-class BasicReceivablePacket(private val buffer: ByteBuffer) : ReceivablePacket {
+/**
+ * A [ReceivablePacket] backed by a [ByteBuffer].
+ * @param[buffer] the buffer to back this packet (should be in default writing mode!)
+ */
+class ByteBufferReceivablePacket(private val buffer: ByteBuffer) : ReceivablePacket {
     override fun readInt() = buffer.int
     override fun readShort() = buffer.short
     override fun readLong() = buffer.long
@@ -21,7 +25,7 @@ class BasicReceivablePacket(private val buffer: ByteBuffer) : ReceivablePacket {
         buffer.put(byte)
     }
 
-    override fun flip() {
+    override fun prepareRead() {
         buffer.flip()
     }
 

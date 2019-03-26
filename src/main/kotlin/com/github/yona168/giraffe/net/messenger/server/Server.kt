@@ -1,7 +1,6 @@
 package com.github.yona168.giraffe.net.messenger.server
 
 import com.github.yona168.giraffe.net.messenger.Toggled
-import com.github.yona168.giraffe.net.messenger.Writable
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
 import com.github.yona168.giraffe.net.packet.SendablePacket
@@ -10,8 +9,7 @@ import java.util.*
 import java.util.function.Consumer
 
 /**
- * The interface used by [GServer]. In Giraffe, a Server is simply a router of [Client]s-it has no capabilities on its own.
- * As such, the functions defined here simply manage [Client]s
+ * The central object to route client connections.
  */
 interface Server : Toggled, CanProcessPackets, CoroutineScope {
 
@@ -20,15 +18,21 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
      */
     val clients: Collection<Client>
 
-    fun onConnect(func: Consumer<Client>): Boolean
     /**
-     * Closes a client server-side. This calls [Client.close].
+     * Registers a function to run with a connection once it connects.
+     * @param[func] the function to execute, passing the connected client connection as an argument.
+     * @return true if this process was successfully registered.
+     */
+    fun onConnect(func: Consumer<Client>): Boolean
+
+    /**
+     * Closes a client server-side. This disables the client on both ends.
      * @param [uuid] The session [UUID] of the client, as referenced with [Client.sessionUUID]
      */
     fun closeClient(uuid: UUID)
 
     /**
-     * Sends a packet to a specified client. This calls [Writable.write]
+     * Sends a packet to a specified client. This calls [Client.write]
      * @param [uuid] The session [UUID] of the client, as referenced with [Client.sessionUUID]
      */
     fun sendToClient(uuid: UUID, packet: SendablePacket): Boolean
