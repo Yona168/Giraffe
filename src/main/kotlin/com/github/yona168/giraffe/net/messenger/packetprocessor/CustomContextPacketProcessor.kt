@@ -23,7 +23,7 @@ class CustomContextPacketProcessor(context: CoroutineContext) : MappedPacketProc
          * of [Dispatchers.Default]
          */
         @JvmStatic
-        fun default() = CustomContextPacketProcessor(Dispatchers.Default)
+        fun defaultDispatch() = CustomContextPacketProcessor(Dispatchers.Default)
     }
 }
 

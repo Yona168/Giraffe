@@ -14,17 +14,16 @@ interface PacketProcessor : Toggleable, CoroutineScope {
      * Registers a read [Opcode] to a [PacketHandlerFunction] to process the packet.
      * @param[opcode] The [Opcode] to register.
      * @param[func] the [PacketHandlerFunction] to register to the opcode.
-     * @return The previously registered [PacketHandlerFunction] to the passed opcode, or null if no prior
-     * function exists.
+     * @return This for chaining
      */
-    fun on(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction?
+    fun on(opcode: Opcode, func: PacketHandlerFunction): PacketProcessor
 
     /**
      * Unregisters a read [Opcode] from being processed.
      * @param[opcode] The opcode to stop listening to.
-     * @return The [PacketHandlerFunction] that has been unregistered, or null if no function existed for [opcode].
+     * @return This for chaining
      */
-    fun disableHandler(opcode: Opcode): PacketHandlerFunction?
+    fun disableHandler(opcode: Opcode): PacketProcessor
 
     /**
      * Processes a [ReceivablePacket] by invoking a [PacketHandlerFunction], as registered with the passed [Opcode], with

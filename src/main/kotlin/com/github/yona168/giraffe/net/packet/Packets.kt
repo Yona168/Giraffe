@@ -1,3 +1,5 @@
+@file:JvmName("Packets")
+
 package com.github.yona168.giraffe.net.packet
 
 import com.github.yona168.giraffe.net.constants.Opcode
