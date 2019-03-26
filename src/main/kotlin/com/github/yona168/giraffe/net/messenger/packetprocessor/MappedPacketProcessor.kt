@@ -23,12 +23,12 @@ abstract class MappedPacketProcessor : PacketProcessorComponent() {
         handlerMap[opcode]?.handle(networker, packet)
     }
 
-    override fun on(opcode: Opcode, func: PacketHandlerFunction): PacketHandlerFunction? {
-        return handlerMap.put(opcode, func)
+    override fun on(opcode: Opcode, func: PacketHandlerFunction)=this.apply{
+         handlerMap.put(opcode, func)
     }
 
-    override fun disableHandler(opcode: Opcode): PacketHandlerFunction? {
-        return handlerMap.remove(opcode)
+    override fun disableHandler(opcode: Opcode)=this.apply{
+        handlerMap.remove(opcode)
     }
 
 }
