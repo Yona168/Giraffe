@@ -43,7 +43,7 @@ compileKotlin {
 
 dokka {
     outputFormat = 'javadoc'
-    outputDirectory = file("/Output/javadoc")
+    outputDirectory = file("javadoc")
     jdkVersion=8
     sourceRoot {
         // Path to source root
