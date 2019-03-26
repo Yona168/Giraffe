@@ -1,0 +1,8 @@
+com.github.yona168.giraffe.net
+com.github.yona168.giraffe.net.constants
+com.github.yona168.giraffe.net.messenger
+com.github.yona168.giraffe.net.messenger.client
+com.github.yona168.giraffe.net.messenger.packetprocessor
+com.github.yona168.giraffe.net.messenger.server
+com.github.yona168.giraffe.net.packet
+com.github.yona168.giraffe.net.packet.pool
