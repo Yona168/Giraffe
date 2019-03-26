@@ -13,7 +13,6 @@ import java.util.function.Consumer
  *
  */
 interface Client : Toggled, CanProcessPackets, CoroutineScope {
-
     /**
      * The [UUID] given to the client by some server that it connects to. This allows for clients to easily target
      * other clients by referencing their session UUID in a [SendablePacket]. This is null if the server has not told
