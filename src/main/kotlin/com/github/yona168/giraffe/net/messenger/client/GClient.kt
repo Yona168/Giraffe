@@ -331,10 +331,10 @@ class GClient private constructor(
                 onPacketReceiveListeners.forEach { it.accept(this@GClient) }
                 val setOpcode = opcode
                 launch(coroutineContext) {
-                    packetProcessor.handle(
+                    packetProcessor.handleSuspend(
+                        this@GClient,
                         setOpcode,
-                        buffer,
-                        this@GClient
+                        buffer
                     )
                     bufferPool.clearAndRelease(buffer)
                 }

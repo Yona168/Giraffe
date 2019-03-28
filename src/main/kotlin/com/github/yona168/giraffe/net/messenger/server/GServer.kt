@@ -79,7 +79,7 @@ class GServer constructor(
             socketChannel.accept(cont, AcceptHandler)
         }
 
-    override fun onConnect(func: Consumer<Client>) = onConnects.add(func)
+    override fun onConnect(func: Consumer<Client>) = apply{onConnects.add(func)}
 
     override fun closeClient(uuid: UUID) {
         channels[uuid]?.apply { close(this) }

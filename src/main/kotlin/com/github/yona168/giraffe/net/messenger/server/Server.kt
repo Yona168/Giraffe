@@ -1,8 +1,10 @@
 package com.github.yona168.giraffe.net.messenger.server
 
+import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.Toggled
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
+import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketHandlerFunction
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
@@ -21,9 +23,9 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
     /**
      * Registers a function to run with a connection once it connects.
      * @param[func] the function to execute, passing the connected client connection as an argument.
-     * @return true if this process was successfully registered.
+     * @return this for chaining
      */
-    fun onConnect(func: Consumer<Client>): Boolean
+    fun onConnect(func: Consumer<Client>): Server
 
     /**
      * Closes a client server-side. This disables the client on both ends.
@@ -34,6 +36,7 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
     /**
      * Sends a packet to a specified client. This calls [Client.write]
      * @param [uuid] The session [UUID] of the client, as referenced with [Client.sessionUUID]
+     * @return true if a client for [uuid] existed and was written [packet]
      */
     fun sendToClient(uuid: UUID, packet: SendablePacket): Boolean
 
@@ -43,5 +46,20 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
      */
     @JvmDefault
     fun sendToAllClients(packet: SendablePacket) = clients.forEach { it.write(packet) }
+
+    override fun onEnable(vararg listeners: Runnable): Server
+    override fun onDisable(vararg listeners: Runnable): Server
+
+    @JvmDefault
+    override fun on(opcode: Opcode, func: PacketHandlerFunction): Server {
+        super.on(opcode, func)
+        return this
+    }
+
+    @JvmDefault
+    override fun disableHandler(opcode: Opcode): Server {
+        super.disableHandler(opcode)
+        return this
+    }
 
 }

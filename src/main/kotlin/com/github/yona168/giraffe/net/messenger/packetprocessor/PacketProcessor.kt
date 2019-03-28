@@ -5,6 +5,8 @@ import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * A PacketProcessor is used to process [ReceivablePacket]s.
@@ -27,10 +29,16 @@ interface PacketProcessor : Toggleable, CoroutineScope {
 
     /**
      * Processes a [ReceivablePacket] by invoking a [PacketHandlerFunction], as registered with the passed [Opcode], with
-     * the [ReceivablePacket] and an [Client].
+     * the [ReceivablePacket] and an [Client]. This launches a new coroutine with [coroutineContext] context, and returns its [Job].
      * @param[opcode] the [Opcode] to get the registered [PacketHandlerFunction] with.
      * @param[packet] The [ReceivablePacket] to handle.
      * @param[client] the [Client] to pass into the [PacketHandlerFunction]
+     * @return[Job] of this coroutine
      */
-    suspend fun handle(opcode: Opcode, packet: ReceivablePacket, client: Client)
+    @JvmDefault
+    fun handle(client: Client, opcode: Opcode, packet: ReceivablePacket):Job
+
+    suspend fun handleSuspend(client: Client, opcode: Opcode, packet: ReceivablePacket){
+        handle(client,opcode,packet).join()
+    }
 }

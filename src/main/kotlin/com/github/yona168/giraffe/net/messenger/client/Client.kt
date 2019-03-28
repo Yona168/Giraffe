@@ -1,8 +1,12 @@
 package com.github.yona168.giraffe.net.messenger.client
 
+import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.Toggled
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
+import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketHandlerFunction
+import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.SendablePacket
+import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -46,6 +50,21 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      * @return this for chaining.
      */
     fun onHandshake(func: Consumer<Client>): Client
+
+    override fun onEnable(vararg listeners: Runnable):Client
+    override fun onDisable(vararg listeners: Runnable):Client
+
+    @JvmDefault
+    override fun on(opcode: Opcode, func: PacketHandlerFunction): Client {
+        super.on(opcode, func)
+        return this
+    }
+
+    @JvmDefault
+    override fun disableHandler(opcode: Opcode): Client{
+        super.disableHandler(opcode)
+        return this
+    }
 
 
 }

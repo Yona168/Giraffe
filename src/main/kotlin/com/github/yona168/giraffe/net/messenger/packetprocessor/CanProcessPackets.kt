@@ -3,6 +3,7 @@ package com.github.yona168.giraffe.net.messenger.packetprocessor
 import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
+import kotlinx.coroutines.Job
 
 /**
  * An object that has a [PacketProcessor] as a field
@@ -14,19 +15,30 @@ interface CanProcessPackets {
     /**
      * Calls [PacketProcessor.handle] with [packetProcessor]
      * @see[PacketProcessor.handle]
+     * @return this for chaining
      */
-    suspend fun handle(opcode: Opcode, packet: ReceivablePacket, networker: Client) =
-        packetProcessor.handle(opcode, packet, networker)
+    @JvmDefault
+     fun handle(client: Client, opcode: Opcode, packet: ReceivablePacket)=packetProcessor.handle(client, opcode, packet)
 
     /**
      * Calls [PacketProcessor.on] with [packetProcessor]
      * @see[PacketProcessor.on]
+     * @return this for chaining
      */
-    fun on(opcode: Opcode, func: PacketHandlerFunction) = packetProcessor.on(opcode, func)
+    @JvmDefault
+    fun on(opcode: Opcode, func: PacketHandlerFunction): CanProcessPackets {
+        packetProcessor.on(opcode, func)
+        return this
+    }
 
     /**
      * Calls [PacketProcessor.disableHandler] with [packetProcessor]
      * @see[PacketProcessor.disableHandler]
+     * @return this for chaining
      */
-    fun disableHandler(opcode: Opcode) = packetProcessor.disableHandler(opcode)
+    @JvmDefault
+    fun disableHandler(opcode: Opcode): CanProcessPackets {
+        packetProcessor.disableHandler(opcode)
+        return this
+    }
 }
