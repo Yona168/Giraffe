@@ -101,12 +101,12 @@ class GClient private constructor(
     /**
      * The collection of listeners ran when a packet is received, registered through [onPacketReceive]
      */
-    private val onPacketReceiveListeners: MutableSet<Consumer<Client>> = mutableSetOf()
+    private val onPacketReceiveListeners: MutableSet<(Client)->Unit> = mutableSetOf()
 
     /**
      * The collection of listeners ran when the handshake packet is received, registered through [onHandshake]
      */
-    private val onHandshakeListeners: MutableSet<Consumer<Client>> = mutableSetOf()
+    private val onHandshakeListeners: MutableSet<(Client)->Unit> = mutableSetOf()
 
     /**
      * A [UUID] used for [hashCode], as [sessionUUID] cannot be used for that
@@ -176,7 +176,7 @@ class GClient private constructor(
                     when (opcode) {
                         HANDSHAKE_SUB_IDENTIFIER -> {
                             backingSessionUUID = packet.readUUID()
-                            onHandshakeListeners.forEach { it.accept(this) }
+                            onHandshakeListeners.forEach { it(this) }
                         }
                     }
                 }
@@ -270,9 +270,9 @@ class GClient private constructor(
     }
 
 
-    override fun onPacketReceive(func: Consumer<Client>) = apply { onPacketReceiveListeners.add(func) }
+    override fun onPacketReceive(func: (Client)->Unit) = apply { onPacketReceiveListeners.add(func) }
 
-    override fun onHandshake(func: Consumer<Client>) = apply { onHandshakeListeners.add(func) }
+    override fun onHandshake(func: (Client)->Unit) = apply { onHandshakeListeners.add(func) }
 
 
     override fun onEnable(vararg listeners: Runnable):GClient=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
@@ -331,7 +331,7 @@ class GClient private constructor(
                     buffer.put(inbox.get())
                 }
                 buffer.prepareRead()
-                onPacketReceiveListeners.forEach { it.accept(this@GClient) }
+                onPacketReceiveListeners.forEach { it(this@GClient) }
                 val setOpcode = opcode
                 launch(coroutineContext) {
                     packetProcessor.handleSuspend(

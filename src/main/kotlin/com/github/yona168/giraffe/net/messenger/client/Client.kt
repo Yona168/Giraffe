@@ -8,7 +8,6 @@ import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
 import java.util.concurrent.CompletableFuture
-import java.util.function.Consumer
 
 /**
  * Defines the basic functionality of a client. Giraffe implements this with [GClient].
@@ -37,7 +36,7 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      * @param[func] The function to execute when a packet is received, prior to processing it
      * @return this for chaining.
      */
-    fun onPacketReceive(func: Consumer<Client>): Client
+    fun onPacketReceive(func: (Client) -> Unit): Client
 
 
     /**
@@ -48,12 +47,11 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      * @param[func] the function to execute when a specified handshake packet is received.
      * @return this for chaining.
      */
-    fun onHandshake(func: Consumer<Client>): Client
+    fun onHandshake(func: (Client) -> Unit): Client
 
 
     override fun onEnable(vararg listeners: Runnable): Client
     override fun onDisable(vararg listeners: Runnable): Client
-
 
 
     @JvmDefault
