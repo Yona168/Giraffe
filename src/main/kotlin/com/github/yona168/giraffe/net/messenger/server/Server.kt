@@ -4,11 +4,10 @@ import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.Toggled
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
-import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketHandlerFunction
+import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * The central object to route client connections.
@@ -25,7 +24,7 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
      * @param[func] the function to execute, passing the connected client connection as an argument.
      * @return this for chaining
      */
-    fun onConnect(func: Consumer<Client>): Server
+    fun onConnect(func: (Client) -> Unit): Server
 
     /**
      * Closes a client server-side. This disables the client on both ends.
@@ -51,7 +50,7 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
     override fun onDisable(vararg listeners: Runnable): Server
 
     @JvmDefault
-    override fun on(opcode: Opcode, func: PacketHandlerFunction): Server {
+    override fun on(opcode: Opcode, func: (Client, ReceivablePacket) -> Unit): Server {
         super.on(opcode, func)
         return this
     }

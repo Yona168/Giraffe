@@ -19,4 +19,10 @@ interface Toggled : Toggleable {
      * @return this for chaining.
      */
     fun onDisable(vararg listeners: Runnable): Toggled
+
+    @JvmDefault
+    fun onEnable(function: ()->Unit)=onEnable(Runnable(function))
+
+    @JvmDefault
+    fun onDisable(function: ()->Unit)=onDisable(Runnable(function))
 }

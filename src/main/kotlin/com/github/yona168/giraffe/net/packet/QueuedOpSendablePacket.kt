@@ -20,22 +20,22 @@ class QueuedOpSendablePacket(private val opcode: Opcode) : SendablePacket {
     /**
      * The queue to hold the operations
      */
-    private val queueOperations = ArrayDeque<Consumer<ByteBuffer>>()
+    private val queueOperations = ArrayDeque<(ByteBuffer)->Unit>()
     private var amtBytes: Size = 0
     private var firstBuild = false
-    override fun writeInt(i: Int) = write(Int.SIZE_BYTES, Consumer { buf -> buf.putInt(i) })
-    override fun writeByte(b: Byte) = write(Byte.SIZE_BYTES, Consumer { buf -> buf.put(b) })
-    override fun writeDouble(d: Double) = write(java.lang.Double.BYTES, Consumer { buf -> buf.putDouble(d) })
-    override fun writeLong(l: Long) = write(Long.SIZE_BYTES, Consumer { buf -> buf.putLong(l) })
-    override fun writeShort(s: Short) = write(Short.SIZE_BYTES, Consumer { buf -> buf.putShort(s) })
-    override fun writeBytes(vararg b: Byte) = write(Byte.SIZE_BYTES * b.size, Consumer { buf -> buf.put(b) })
+    override fun writeInt(i: Int) = write(Int.SIZE_BYTES){ buf -> buf.putInt(i) }
+    override fun writeByte(b: Byte) = write(Byte.SIZE_BYTES){ buf -> buf.put(b) }
+    override fun writeDouble(d: Double) = write(java.lang.Double.BYTES){ buf -> buf.putDouble(d) }
+    override fun writeLong(l: Long) = write(Long.SIZE_BYTES){ buf -> buf.putLong(l) }
+    override fun writeShort(s: Short) = write(Short.SIZE_BYTES){ buf -> buf.putShort(s) }
+    override fun writeBytes(vararg b: Byte) = write(Byte.SIZE_BYTES * b.size){ buf -> buf.put(b) }
     override fun writeString(s: String) = this.apply {
         val bytes = s.toByteArray()
         writeInt(bytes.size)
         writeBytes(*bytes)
     }
 
-    private fun write(size: Int, op: Consumer<ByteBuffer>) = this.apply {
+    private fun write(size: Int, op: (ByteBuffer)->Unit) = this.apply {
         if (amtBytes + size > MAX_PACKET_BYTE_SIZE) {
             throw IllegalArgumentException("Packet length cannot exceed $MAX_PACKET_BYTE_SIZE. Your size would have been ${MAX_PACKET_BYTE_SIZE + amtBytes}")
         } else {
@@ -51,10 +51,10 @@ class QueuedOpSendablePacket(private val opcode: Opcode) : SendablePacket {
         val buffer = ByteBuffer.allocate(amtBytes + Size.SIZE_BYTES + Opcode.SIZE_BYTES)
         if (!firstBuild) {
             firstBuild = true
-            queueOperations.offerFirst(Consumer { buf -> buf.putInt(amtBytes) })
-            queueOperations.offerFirst(Consumer { buf -> buf.put(opcode) })
+            queueOperations.offerFirst{ buf -> buf.putInt(amtBytes) }
+            queueOperations.offerFirst{ buf -> buf.put(opcode) }
         }
-        queueOperations.forEach { it.accept(buffer) }
+        queueOperations.forEach { it(buffer) }
         buffer.flip()
         return buffer
     }

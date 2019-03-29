@@ -13,12 +13,12 @@ import kotlinx.coroutines.launch
  */
 interface PacketProcessor : Toggleable, CoroutineScope {
     /**
-     * Registers a read [Opcode] to a [PacketHandlerFunction] to process the packet.
+     * Registers a read [Opcode] to a function to process the packet.
      * @param[opcode] The [Opcode] to register.
-     * @param[func] the [PacketHandlerFunction] to register to the opcode.
+     * @param[func] the function to register to the opcode.
      * @return This for chaining
      */
-    fun on(opcode: Opcode, func: PacketHandlerFunction): PacketProcessor
+    fun on(opcode: Opcode, func: (Client, ReceivablePacket)->Unit): PacketProcessor
 
     /**
      * Unregisters a read [Opcode] from being processed.
@@ -28,11 +28,11 @@ interface PacketProcessor : Toggleable, CoroutineScope {
     fun disableHandler(opcode: Opcode): PacketProcessor
 
     /**
-     * Processes a [ReceivablePacket] by invoking a [PacketHandlerFunction], as registered with the passed [Opcode], with
+     * Processes a [ReceivablePacket] by invoking a function, as registered with the passed [Opcode], with
      * the [ReceivablePacket] and an [Client]. This launches a new coroutine with [coroutineContext] context, and returns its [Job].
-     * @param[opcode] the [Opcode] to get the registered [PacketHandlerFunction] with.
+     * @param[opcode] the [Opcode] to get the registered function with.
      * @param[packet] The [ReceivablePacket] to handle.
-     * @param[client] the [Client] to pass into the [PacketHandlerFunction]
+     * @param[client] the [Client] to pass into the function.
      * @return[Job] of this coroutine
      */
     @JvmDefault

@@ -2,8 +2,8 @@ package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.constants.*
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
+import com.github.yona168.giraffe.net.messenger.Toggled
 import com.github.yona168.giraffe.net.messenger.client.GClient.Companion.Side
-import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketHandlerFunction
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.messenger.server.Server
 import com.github.yona168.giraffe.net.onEnable
@@ -15,6 +15,7 @@ import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.lang.Runnable
 import java.net.SocketAddress
 import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
@@ -142,7 +143,7 @@ class GClient private constructor(
         On enable, if the socket channel is closed and the side is serverside, that means this is not the first enable. Throw an exception if so.
         If its clientside, just back a new channel and reset the session uuid
          */
-        onEnable {
+        this.onEnable {
             if (!socketChannel.isOpen) {
                 when (side) {
                     Side.Serverside -> throw IllegalStateException("A Server-side GClient cannot be re-enabled!")
@@ -169,10 +170,8 @@ class GClient private constructor(
                 Objects.requireNonNull(address)
                 connect(address as SocketAddress)
 
-                fun packetHandlerFunc(func: (ReceivablePacket, Client) -> Unit) = object : PacketHandlerFunction {
-                    override fun handle(client: Client, packet: ReceivablePacket) = func(packet, client)
-                }
-                packetProcessor.on(INTERNAL_OPCODE, packetHandlerFunc { packet: ReceivablePacket, _: Client ->
+
+                packetProcessor.on(INTERNAL_OPCODE) { _,packet ->
                     val opcode = packet.readByte()
                     when (opcode) {
                         HANDSHAKE_SUB_IDENTIFIER -> {
@@ -180,7 +179,7 @@ class GClient private constructor(
                             onHandshakeListeners.forEach { it.accept(this) }
                         }
                     }
-                })
+                }
 
             }
             //Start reading from channel
@@ -275,8 +274,12 @@ class GClient private constructor(
 
     override fun onHandshake(func: Consumer<Client>) = apply { onHandshakeListeners.add(func) }
 
-    override fun onEnable(vararg listeners: Runnable) = this.apply { super.onEnable(*listeners) }
-    override fun onDisable(vararg listeners: Runnable) = this.apply { super.onDisable(*listeners) }
+
+    override fun onEnable(vararg listeners: Runnable):GClient=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
+    override fun onEnable(listeners: ()->Unit) :GClient = apply { super<Client>.onEnable(listeners) }
+
+    override fun onDisable(vararg listeners: Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onDisable(*listeners)}
+    override fun onDisable(listeners: ()->Unit):GClient = apply { super<Client>.onDisable(listeners) }
 
     /**
      * Reads a bunch of bytes from the channel into [inbox]. If the result is -1, which usually means

@@ -3,10 +3,8 @@ package com.github.yona168.giraffe.net.messenger.client
 import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.Toggled
 import com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets
-import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketHandlerFunction
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.SendablePacket
-import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -41,6 +39,7 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      */
     fun onPacketReceive(func: Consumer<Client>): Client
 
+
     /**
      * Tells the client to execute this [func] when it receives a specified handshake packet from the server. This
      * means that packet sending across the socket channel is working, and thus this method is the earliest, safest method
@@ -51,17 +50,20 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      */
     fun onHandshake(func: Consumer<Client>): Client
 
-    override fun onEnable(vararg listeners: Runnable):Client
-    override fun onDisable(vararg listeners: Runnable):Client
+
+    override fun onEnable(vararg listeners: Runnable): Client
+    override fun onDisable(vararg listeners: Runnable): Client
+
+
 
     @JvmDefault
-    override fun on(opcode: Opcode, func: PacketHandlerFunction): Client {
+    override fun on(opcode: Opcode, func: (Client, ReceivablePacket) -> Unit): Client {
         super.on(opcode, func)
         return this
     }
 
     @JvmDefault
-    override fun disableHandler(opcode: Opcode): Client{
+    override fun disableHandler(opcode: Opcode): Client {
         super.disableHandler(opcode)
         return this
     }

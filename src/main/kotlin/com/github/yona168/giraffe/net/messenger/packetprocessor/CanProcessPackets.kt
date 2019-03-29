@@ -26,7 +26,7 @@ interface CanProcessPackets {
      * @return this for chaining
      */
     @JvmDefault
-    fun on(opcode: Opcode, func: PacketHandlerFunction): CanProcessPackets {
+    fun on(opcode: Opcode, func: (Client, ReceivablePacket)->Unit): CanProcessPackets {
         packetProcessor.on(opcode, func)
         return this
     }

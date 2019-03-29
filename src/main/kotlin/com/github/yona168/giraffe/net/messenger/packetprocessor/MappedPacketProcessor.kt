@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
  */
 abstract class MappedPacketProcessor : PacketProcessorComponent() {
 
-    private val handlerMap = mutableMapOf<Opcode, PacketHandlerFunction>()
+    private val handlerMap = mutableMapOf<Opcode, (Client, ReceivablePacket)->Unit>()
 
     override fun handle(client: Client, opcode: Opcode, packet: ReceivablePacket) = launch(coroutineContext) {
         handleByMap(opcode, packet, client)
@@ -19,11 +19,11 @@ abstract class MappedPacketProcessor : PacketProcessorComponent() {
 
 
     private fun handleByMap(opcode: Opcode, packet: ReceivablePacket, networker: Client) {
-        handlerMap[opcode]?.handle(networker, packet)
+        handlerMap[opcode]?.invoke(networker, packet)
     }
 
-    override fun on(opcode: Opcode, func: PacketHandlerFunction) = this.apply {
-        handlerMap.put(opcode, func)
+    override fun on(opcode: Opcode, func: (Client, ReceivablePacket)->Unit) = this.apply {
+        handlerMap[opcode]=func
     }
 
     override fun disableHandler(opcode: Opcode) = this.apply {

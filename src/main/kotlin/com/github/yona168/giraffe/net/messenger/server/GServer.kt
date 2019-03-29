@@ -50,7 +50,7 @@ class GServer constructor(
 
     override val clients: Collection<Client>
         get() = channels.values
-    private val onConnects = mutableSetOf<Consumer<Client>>()
+    private val onConnects = mutableSetOf<(Client)->Unit>()
     private val channels: MutableMap<UUID, Client> = ConcurrentHashMap()
 
     init {
@@ -66,7 +66,7 @@ class GServer constructor(
                     channels[uuid] = client
                     client.enable()
                     client.write(uuidPacket(uuid))
-                    onConnects.forEach { it.accept(client) }
+                    onConnects.forEach { it(client) }
                     yield()
                 }
             }
@@ -79,7 +79,7 @@ class GServer constructor(
             socketChannel.accept(cont, AcceptHandler)
         }
 
-    override fun onConnect(func: Consumer<Client>) = apply{onConnects.add(func)}
+    override fun onConnect(func: (Client)->Unit) = apply{onConnects.add(func)}
 
     override fun closeClient(uuid: UUID) {
         channels[uuid]?.apply { close(this) }
@@ -94,8 +94,11 @@ class GServer constructor(
         return false
     }
 
-    override fun onEnable(vararg listeners: Runnable) = this.apply { super.onEnable(*listeners) }
-    override fun onDisable(vararg listeners: Runnable) = this.apply { super.onDisable(*listeners) }
+    override fun onEnable(vararg listeners: java.lang.Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
+    override fun onEnable(listeners: ()->Unit)=apply { super<Server>.onEnable(listeners) }
+
+    override fun onDisable(vararg listeners: java.lang.Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onDisable(*listeners)}
+    override fun onDisable(listeners: ()->Unit)=apply { super<Server>.onDisable(listeners) }
 
 
     override suspend fun initClose() {
