@@ -275,8 +275,8 @@ class GClient private constructor(
     override fun onHandshake(func: (Client)->Unit) = apply { onHandshakeListeners.add(func) }
 
 
-    override fun onEnable(vararg listeners: Runnable):GClient=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
-    override fun onEnable(listeners: ()->Unit) :GClient = apply { super<Client>.onEnable(listeners) }
+    override fun onEnable(vararg listeners: Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
+    override fun onEnable(listeners: ()->Unit)= apply { super<Client>.onEnable(listeners) }
 
     override fun onDisable(vararg listeners: Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onDisable(*listeners)}
     override fun onDisable(listeners: ()->Unit):GClient = apply { super<Client>.onDisable(listeners) }
