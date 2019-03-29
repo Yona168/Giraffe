@@ -120,10 +120,10 @@ class GServer constructor(
         /**
          * Supplier for handshake packets
          */
-        private fun uuidPacket(uuid: UUID) = packetBuilder(INTERNAL_OPCODE, Consumer {
+        private fun uuidPacket(uuid: UUID) = packetBuilder(INTERNAL_OPCODE){
             it.writeByte(HANDSHAKE_SUB_IDENTIFIER)
             it.writeUUID(uuid)
-        })
+        }
     }
 }
 
