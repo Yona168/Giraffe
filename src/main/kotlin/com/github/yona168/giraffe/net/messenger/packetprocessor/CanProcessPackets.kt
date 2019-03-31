@@ -4,6 +4,7 @@ import com.github.yona168.giraffe.net.constants.Opcode
 import com.github.yona168.giraffe.net.messenger.client.Client
 import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import kotlinx.coroutines.Job
+import java.util.function.BiConsumer
 
 /**
  * An object that has a [PacketProcessor] as a field
@@ -30,6 +31,8 @@ interface CanProcessPackets {
         packetProcessor.on(opcode, func)
         return this
     }
+    @JvmDefault
+    fun on(opcode: Opcode, func: BiConsumer<Client, ReceivablePacket>)=on(opcode){ client, packet->func.accept(client, packet)}
 
     /**
      * Calls [PacketProcessor.disableHandler] with [packetProcessor]

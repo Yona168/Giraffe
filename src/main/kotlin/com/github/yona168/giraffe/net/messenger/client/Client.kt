@@ -8,6 +8,7 @@ import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.function.BiConsumer
 
 /**
  * Defines the basic functionality of a client. Giraffe implements this with [GClient].
@@ -38,6 +39,8 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      */
     fun onPacketReceive(func: () -> Unit): Client
 
+    @JvmDefault
+    fun onPacketReceive(func:Runnable)=onPacketReceive { func.run() }
 
     /**
      * Tells the client to execute this [func] when it receives a specified handshake packet from the server. This
@@ -48,6 +51,9 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      * @return this for chaining.
      */
     fun onHandshake(func: () -> Unit): Client
+
+    @JvmDefault
+    fun onHandshake(func: Runnable)=onHandshake { func.run() }
 
 
     override fun onEnable(vararg listeners: Runnable): Client
@@ -63,6 +69,9 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
         super.on(opcode, func)
         return this
     }
+
+    @JvmDefault
+    override fun on(opcode: Opcode, func: BiConsumer<Client, ReceivablePacket>)=on(opcode){ client, packet->func.accept(client, packet)}
 
     @JvmDefault
     override fun disableHandler(opcode: Opcode): Client {

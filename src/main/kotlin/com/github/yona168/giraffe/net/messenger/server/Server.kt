@@ -8,6 +8,8 @@ import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import kotlinx.coroutines.CoroutineScope
 import java.util.*
+import java.util.function.BiConsumer
+import java.util.function.Consumer
 
 /**
  * The central object to route client connections.
@@ -25,6 +27,9 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
      * @return this for chaining
      */
     fun onConnect(func: (Client) -> Unit): Server
+
+    @JvmDefault
+    fun onConnect(func: Consumer<Client>)=onConnect{func.accept(it)}
 
     /**
      * Closes a client server-side. This disables the client on both ends.
@@ -66,5 +71,8 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
         super.disableHandler(opcode)
         return this
     }
+    @JvmDefault
+    override fun on(opcode: Opcode, func: BiConsumer<Client, ReceivablePacket>)=on(opcode){client, packet->func.accept(client, packet)}
+
 
 }
