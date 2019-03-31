@@ -55,7 +55,7 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
     override fun onEnable(function: () -> Unit)=apply{super.onEnable(function)}
     override fun onDisable(vararg listeners: Runnable): Client
     @JvmDefault
-    override fun onDisable(function: () -> Unit)=apply{super.onEnable(function)}
+    override fun onDisable(function: () -> Unit)=apply{super.onDisable(function)}
 
 
     @JvmDefault

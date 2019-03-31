@@ -52,7 +52,7 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
 
     override fun onDisable(vararg listeners: Runnable): Server
     @JvmDefault
-    override fun onDisable(function: () -> Unit)=apply{super.onEnable(function)}
+    override fun onDisable(function: () -> Unit)=apply{super.onDisable(function)}
 
 
     @JvmDefault
