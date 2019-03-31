@@ -10,8 +10,11 @@ import java.util.function.Consumer
  * @param[opcode] the [Opcode] of the packet.
  * @param[packetFunc] the function to put the packet through.
  */
-fun packetBuilder(opcode: Opcode, packetFunc: (SendablePacket)->Unit): QueuedOpSendablePacket {
+fun packetBuilder(opcode: Opcode, packetFunc: (SendablePacket) -> Unit): QueuedOpSendablePacket {
     val packet = QueuedOpSendablePacket(opcode)
     packetFunc(packet)
     return packet
 }
+
+fun packetBuilder(opcode: Opcode, packetFunc: (Consumer<SendablePacket>)) =
+    packetBuilder(opcode) { packetFunc.accept(it) }
