@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>com.github.yona168.giraffe.net.messenger.client - Giraffe</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="./index.html">com.github.yona168.giraffe.net.messenger.client</a><br/>
+<br/>
+<h2>Package com.github.yona168.giraffe.net.messenger.client</h2>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-client/index.html">Client</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">Client</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.messenger/-toggled/index.html"><span class="identifier">Toggled</span></a><span class="symbol">, </span><a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-can-process-packets/index.html"><span class="identifier">CanProcessPackets</span></a><span class="symbol">, </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html"><span class="identifier">CoroutineScope</span></a></code>
+<p>Defines the basic functionality of a client. Giraffe implements this with <a href="-g-client/index.html">GClient</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-g-client/index.html">GClient</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">GClient</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.messenger/-messenger/index.html"><span class="identifier">Messenger</span></a><span class="symbol">, </span><a href="-client/index.html"><span class="identifier">Client</span></a></code>
+<p>The default implementation of <a href="-client/index.html">Client</a>. For internal packets, this uses the opcode identifier of <a href="../com.github.yona168.giraffe.net.constants/-i-n-t-e-r-n-a-l_-o-p-c-o-d-e.html">INTERNAL_OPCODE</a>.
+Thus, NOTHING else should be registered under that opcode. Further, any implementation of <a href="../com.github.yona168.giraffe.net.messenger.server/-server/index.html">Server</a> that uses this class
+should send a <a href="../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html">SendablePacket</a> made EXACTLY like this one:</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="connect.html">connect</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">connect</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client$connect(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/address">address</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html"><span class="identifier">SocketAddress</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client$connect(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/timeoutMillis">timeoutMillis</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a>&nbsp;<span class="symbol">=</span>&nbsp;1000<span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client$connect(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a>&nbsp;<span class="symbol">=</span>&nbsp;CustomContextPacketProcessor.defaultDispatch()<span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client$connect(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/pool">pool</span><span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span><span class="symbol">: </span><a href="-client/index.html"><span class="identifier">Client</span></a></code>
+<p>This simply calls <a href="-g-client/new-clientside.html">GClient.newClientside</a> with the passed arguments.
+This is simply here to provide a layer of abstraction for a default <a href="-client/index.html">Client</a>
+implementation. If, for some reason, a different implementation of <a href="-client/index.html">Client</a> besides
+<a href="-g-client/index.html">GClient</a> is made the default <a href="-client/index.html">Client</a> to use, this function will update with that.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

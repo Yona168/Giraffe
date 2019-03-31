@@ -31,8 +31,10 @@ interface CanProcessPackets {
         packetProcessor.on(opcode, func)
         return this
     }
+
     @JvmDefault
     fun on(opcode: Opcode, func: BiConsumer<Client, ReceivablePacket>)=on(opcode){ client, packet->func.accept(client, packet)}
+
 
     /**
      * Calls [PacketProcessor.disableHandler] with [packetProcessor]

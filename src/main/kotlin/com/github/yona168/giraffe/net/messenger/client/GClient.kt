@@ -140,6 +140,9 @@ class GClient private constructor(
      */
     private var backingSide: Side = side
 
+    override val isCancelled: Boolean
+        get() = super.isCancelled &&(side==Side.Serverside||(packetProcessor.coroutineContext[Job]!!.isCancelled))
+
     init {
         /*
         On enable, if the socket channel is closed and the side is serverside, that means this is not the first enable. Throw an exception if so.
@@ -362,7 +365,7 @@ class GClient private constructor(
         }
     }
 
-    override suspend fun initClose() {
+    override fun initClose() {
         if (this.backingSide == Side.Clientside) {
             packetProcessor.disable()
         }

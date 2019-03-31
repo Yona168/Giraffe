@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>com.github.yona168.giraffe.net.messenger.packetprocessor - Giraffe</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="./index.html">com.github.yona168.giraffe.net.messenger.packetprocessor</a><br/>
+<br/>
+<h2>Package com.github.yona168.giraffe.net.messenger.packetprocessor</h2>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-can-process-packets/index.html">CanProcessPackets</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">CanProcessPackets</span></code>
+<p>An object that has a <a href="-packet-processor/index.html">PacketProcessor</a> as a field</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-custom-context-packet-processor/index.html">CustomContextPacketProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">CustomContextPacketProcessor</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-mapped-packet-processor/index.html"><span class="identifier">MappedPacketProcessor</span></a></code>
+<p>A <a href="-mapped-packet-processor/index.html">MappedPacketProcessor</a> that handles packets on a custom <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-fixed-thread-pool-packet-processor/index.html">FixedThreadPoolPacketProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">FixedThreadPoolPacketProcessor</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-mapped-packet-processor/index.html"><span class="identifier">MappedPacketProcessor</span></a></code>
+<p>A <a href="-mapped-packet-processor/index.html">MappedPacketProcessor</a> that launches coroutines from a fixed thread pool created with a specified amount of threads.
+numThreads must NOT exceed the amount defined by:</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-mapped-packet-processor/index.html">MappedPacketProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">MappedPacketProcessor</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-packet-processor-component/index.html"><span class="identifier">PacketProcessorComponent</span></a></code>
+<p>A <a href="-packet-processor/index.html">PacketProcessor</a> that uses a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a> to register/unregister <a href="../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a>s and packet handler functions from
+each other.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-packet-processor/index.html">PacketProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">PacketProcessor</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">Toggleable</span><span class="symbol">, </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html"><span class="identifier">CoroutineScope</span></a></code>
+<p>A PacketProcessor is used to process <a href="../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a>s.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-packet-processor-component/index.html">PacketProcessorComponent</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">PacketProcessorComponent</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a><span class="symbol">, </span><a href="../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html"><span class="identifier">ScopedComponent</span></a></code>
+<p>Joins the abstractions for <a href="-packet-processor/index.html">PacketProcessor</a> to <a href="../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html">ScopedComponent</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-single-thread-packet-processor/index.html">SingleThreadPacketProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">SingleThreadPacketProcessor</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-fixed-thread-pool-packet-processor/index.html"><span class="identifier">FixedThreadPoolPacketProcessor</span></a></code>
+<p>A <a href="-packet-processor/index.html">PacketProcessor</a> that processes all packets on one thread. This is convinient if packets must be processed
+in a sequential order. Creating an instance of this class is equivalent to creating a <a href="-fixed-thread-pool-packet-processor/index.html">FixedThreadPoolPacketProcessor</a>
+with a thread amount of 1</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

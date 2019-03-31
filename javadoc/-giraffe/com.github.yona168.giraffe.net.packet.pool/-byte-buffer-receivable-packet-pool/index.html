@@ -1,0 +1,73 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>ByteBufferReceivablePacketPool - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.packet.pool</a>&nbsp;/&nbsp;<a href="./index.html">ByteBufferReceivablePacketPool</a><br/>
+<br/>
+<h1>ByteBufferReceivablePacketPool</h1>
+<code><span class="keyword">class </span><span class="identifier">ByteBufferReceivablePacketPool</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../-queued-pool/index.html"><span class="identifier">QueuedPool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A pool for <a href="../../com.github.yona168.giraffe.net.packet/-byte-buffer-receivable-packet/index.html">ByteBufferReceivablePacket</a>s.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">ByteBufferReceivablePacketPool</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p>A pool for <a href="../../com.github.yona168.giraffe.net.packet/-byte-buffer-receivable-packet/index.html">ByteBufferReceivablePacket</a>s.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="clear.html">clear</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">clear</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool$clear(com.github.yona168.giraffe.net.packet.ReceivablePacket)/item">item</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a></code>
+<p>Clears the passed <a href="clear.html#com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool$clear(com.github.yona168.giraffe.net.packet.ReceivablePacket)/item">item</a> by calling <a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/clear.html">ReceivablePacket.clear</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="create-new.html">createNew</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">createNew</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.github.yona168.giraffe.net.packet/-byte-buffer-receivable-packet/index.html"><span class="identifier">ByteBufferReceivablePacket</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-queued-pool/get.html">get</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">get</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../-queued-pool/index.html#T"><span class="identifier">T</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../-queued-pool/release.html">release</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">release</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.pool.QueuedPool$release(com.github.yona168.giraffe.net.packet.pool.QueuedPool.T)/item">item</span><span class="symbol">:</span>&nbsp;<a href="../-queued-pool/index.html#T"><span class="identifier">T</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Releases the passed <a href="../-pool/release.html#com.github.yona168.giraffe.net.packet.pool.Pool$release(com.github.yona168.giraffe.net.packet.pool.Pool.T)/item">item</a> back into the pool WITHOUT clearing it first.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

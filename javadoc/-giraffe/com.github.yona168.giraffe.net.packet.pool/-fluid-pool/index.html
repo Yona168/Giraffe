@@ -1,0 +1,102 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>FluidPool - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.packet.pool</a>&nbsp;/&nbsp;<a href="./index.html">FluidPool</a><br/>
+<br/>
+<h1>FluidPool</h1>
+<code><span class="keyword">interface </span><span class="identifier">FluidPool</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A pool that can supply new instances if none are available.</p>
+<h3>Inherited Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-pool/next-item.html">nextItem</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">val </span><span class="identifier">nextItem</span><span class="symbol">: </span><a href="../-pool/index.html#T"><span class="identifier">T</span></a></code>
+<p>returns the next item in the pool. Equivalent to calling <a href="../-pool/get.html">get</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="create-new.html">createNew</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">createNew</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="index.html#T"><span class="identifier">T</span></a></code>
+<p>Creates a new instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-pool/clear.html">clear</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">clear</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.pool.Pool$clear(com.github.yona168.giraffe.net.packet.pool.Pool.T)/item">item</span><span class="symbol">:</span>&nbsp;<a href="../-pool/index.html#T"><span class="identifier">T</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-pool/index.html#T"><span class="identifier">T</span></a></code>
+<p>Makes the passed <a href="../-pool/clear.html#com.github.yona168.giraffe.net.packet.pool.Pool$clear(com.github.yona168.giraffe.net.packet.pool.Pool.T)/item">item</a> available for reuse, and thus able to be passed to the pool.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../-pool/clear-and-release.html">clearAndRelease</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">clearAndRelease</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.pool.Pool$clearAndRelease(com.github.yona168.giraffe.net.packet.pool.Pool.T)/item">item</span><span class="symbol">:</span>&nbsp;<a href="../-pool/index.html#T"><span class="identifier">T</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Calls clear on the passed <a href="../-pool/clear-and-release.html#com.github.yona168.giraffe.net.packet.pool.Pool$clearAndRelease(com.github.yona168.giraffe.net.packet.pool.Pool.T)/item">item</a> and THEN releases it.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../-pool/get.html">get</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">get</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../-pool/index.html#T"><span class="identifier">T</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../-pool/release.html">release</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">release</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.pool.Pool$release(com.github.yona168.giraffe.net.packet.pool.Pool.T)/item">item</span><span class="symbol">:</span>&nbsp;<a href="../-pool/index.html#T"><span class="identifier">T</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Releases the passed <a href="../-pool/release.html#com.github.yona168.giraffe.net.packet.pool.Pool$release(com.github.yona168.giraffe.net.packet.pool.Pool.T)/item">item</a> back into the pool WITHOUT clearing it first.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-queued-pool/index.html">QueuedPool</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">QueuedPool</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">FluidPool</span></a><span class="symbol">&lt;</span><a href="../-queued-pool/index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code>
+<p>An implementation of <a href="./index.html">FluidPool</a> that uses a <a href="http://docs.oracle.com/javase/8/docs/api/java/util/Deque.html">Deque</a> to store objects.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

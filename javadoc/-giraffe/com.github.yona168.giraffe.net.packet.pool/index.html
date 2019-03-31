@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>com.github.yona168.giraffe.net.packet.pool - Giraffe</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="./index.html">com.github.yona168.giraffe.net.packet.pool</a><br/>
+<br/>
+<h2>Package com.github.yona168.giraffe.net.packet.pool</h2>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-byte-buffer-receivable-packet-pool/index.html">ByteBufferReceivablePacketPool</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">ByteBufferReceivablePacketPool</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-queued-pool/index.html"><span class="identifier">QueuedPool</span></a><span class="symbol">&lt;</span><a href="../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span></code>
+<p>A pool for <a href="../com.github.yona168.giraffe.net.packet/-byte-buffer-receivable-packet/index.html">ByteBufferReceivablePacket</a>s.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-fluid-pool/index.html">FluidPool</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">FluidPool</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="-fluid-pool/index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code>
+<p>A pool that can supply new instances if none are available.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-pool/index.html">Pool</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">Pool</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span></code>
+<p>A supplier of objects that reuses passed old ones. This allows for less instances and thus more efficiency.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="-queued-pool/index.html">QueuedPool</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">QueuedPool</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="-fluid-pool/index.html"><span class="identifier">FluidPool</span></a><span class="symbol">&lt;</span><a href="-queued-pool/index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code>
+<p>An implementation of <a href="-fluid-pool/index.html">FluidPool</a> that uses a <a href="http://docs.oracle.com/javase/8/docs/api/java/util/Deque.html">Deque</a> to store objects.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

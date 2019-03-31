@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>packetBuilder - Giraffe</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="index.html">com.github.yona168.giraffe.net.packet</a>&nbsp;/&nbsp;<a href="./packet-builder.html">packetBuilder</a><br/>
+<br/>
+<h1>packetBuilder</h1>
+<a name="com.github.yona168.giraffe.net.packet$packetBuilder(kotlin.Byte, kotlin.Function1((com.github.yona168.giraffe.net.packet.SendablePacket, kotlin.Unit)))"></a>
+<code><span class="keyword">fun </span><span class="identifier">packetBuilder</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet$packetBuilder(kotlin.Byte, kotlin.Function1((com.github.yona168.giraffe.net.packet.SendablePacket, kotlin.Unit)))/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.packet$packetBuilder(kotlin.Byte, kotlin.Function1((com.github.yona168.giraffe.net.packet.SendablePacket, kotlin.Unit)))/packetFunc">packetFunc</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="-queued-op-sendable-packet/index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Function that creates a <a href="-queued-op-sendable-packet/index.html">QueuedOpSendablePacket</a> by creating it, passing it through the builder <a href="packet-builder.html#com.github.yona168.giraffe.net.packet$packetBuilder(kotlin.Byte, kotlin.Function1((com.github.yona168.giraffe.net.packet.SendablePacket, kotlin.Unit)))/packetFunc">packetFunc</a>, and then returning it.</p>
+<h3>Parameters</h3>
+<p><a name="opcode"></a>
+<code>opcode</code> - the <a href="../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a> of the packet.</p>
+<p><a name="packetFunc"></a>
+<code>packetFunc</code> - the function to put the packet through.</p>
+<a name="com.github.yona168.giraffe.net.packet$packetBuilder(kotlin.Byte, java.util.function.Consumer((com.github.yona168.giraffe.net.packet.SendablePacket)))"></a>
+<code><span class="keyword">fun </span><span class="identifier">packetBuilder</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet$packetBuilder(kotlin.Byte, java.util.function.Consumer((com.github.yona168.giraffe.net.packet.SendablePacket)))/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.packet$packetBuilder(kotlin.Byte, java.util.function.Consumer((com.github.yona168.giraffe.net.packet.SendablePacket)))/packetFunc">packetFunc</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html"><span class="identifier">Consumer</span></a><span class="symbol">&lt;</span><a href="-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="-queued-op-sendable-packet/index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+</BODY>
+</HTML>

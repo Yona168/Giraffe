@@ -1,0 +1,13 @@
+$dokka.format:html
+$dokka.linkExtension:html
+$dokka.location:com.github.yona168.giraffe.net$onDisable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-disable.html
+$dokka.location:com.github.yona168.giraffe.net$onEnable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-enable.html
+$dokka.location:com.github.yona168.giraffe.net$toPacket(kotlin.String)com.github.yona168.giraffe.net/kotlin.-string/to-packet.html
+com.github.yona168.giraffe.net
+com.github.yona168.giraffe.net.constants
+com.github.yona168.giraffe.net.messenger
+com.github.yona168.giraffe.net.messenger.client
+com.github.yona168.giraffe.net.messenger.packetprocessor
+com.github.yona168.giraffe.net.messenger.server
+com.github.yona168.giraffe.net.packet
+com.github.yona168.giraffe.net.packet.pool

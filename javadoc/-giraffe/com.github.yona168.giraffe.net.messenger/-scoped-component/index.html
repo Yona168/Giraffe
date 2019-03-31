@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>ScopedComponent - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger</a>&nbsp;/&nbsp;<a href="./index.html">ScopedComponent</a><br/>
+<br/>
+<h1>ScopedComponent</h1>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">ScopedComponent</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">Component</span><span class="symbol">, </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html"><span class="identifier">CoroutineScope</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html">CoroutineScope</a> that gets a new job when it enables, and cancels it when it disables.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">ScopedComponent</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p>A <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html">CoroutineScope</a> that gets a new job when it enables, and cancels it when it disables.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="is-cancelled.html">isCancelled</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">val </span><span class="identifier">isCancelled</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>If all resources have been closed/cancelled</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="job.html">job</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">job</span><span class="symbol">: </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html"><span class="identifier">Job</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Extension Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-disable.html">onDisable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onDisable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-enable.html">onEnable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onEnable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-messenger/index.html">Messenger</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">Messenger</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">ScopedComponent</span></a><span class="symbol">, </span><a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-can-process-packets/index.html"><span class="identifier">CanProcessPackets</span></a></code>
+<p>Provides base <a href="#">Component</a> functionality for objects with <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousChannel.html">AsynchronousChannel</a>s and a <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a>.
+Enable/Disable functionality is first handled by <a href="./index.html">ScopedComponent</a>. On enable, <a href="../-messenger/packet-processor.html">packetProcessor</a> is enabled. On disable,
+<a href="../-messenger/init-close.html">initClose</a> is ran, and then <a href="../-messenger/socket-channel.html">socketChannel</a> is closed</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor-component/index.html">PacketProcessorComponent</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">PacketProcessorComponent</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a><span class="symbol">, </span><a href="./index.html"><span class="identifier">ScopedComponent</span></a></code>
+<p>Joins the abstractions for <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> to <a href="./index.html">ScopedComponent</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,205 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GServer - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.server</a>&nbsp;/&nbsp;<a href="./index.html">GServer</a><br/>
+<br/>
+<h1>GServer</h1>
+<code><span class="keyword">class </span><span class="identifier">GServer</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger/-messenger/index.html"><span class="identifier">Messenger</span></a><span class="symbol">, </span><a href="../-server/index.html"><span class="identifier">Server</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>The given implementation for <a href="../-server/index.html">Server</a>. This class uses a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a> to store client <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a>s to the <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> objects, which represent
+server-side connections.
+<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/coroutine-context.html">CoroutineScope.coroutineContext</a> is overriden with <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html">Dispatchers.IO</a>+<a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/job.html">Messenger.job</a>. After
+accepting a Client, it writes a handshake packet (see <a href="../../com.github.yona168.giraffe.net.messenger.client/-g-client/index.html">GClient</a> description), giving it a session UUID as referenced by <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/session-u-u-i-d.html">Client.sessionUUID</a>. Any
+<a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> that uses this server should handle the packet accordingly, or ignore it.</p>
+<h3>Parameters</h3>
+<p><a name="address"></a>
+<code>address</code> - The <a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html">SocketAddress</a> to have the server run on</p>
+<p><a name="packetProcessor"></a>
+<code>packetProcessor</code> - The <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> to process received packets with.</p>
+<p><a name="pool"></a>
+<code>pool</code> - The <a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">Pool</a> to get empty packets from.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">GServer</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$<init>(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/address">address</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html"><span class="identifier">SocketAddress</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$<init>(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a>&nbsp;<span class="symbol">=</span>&nbsp;SingleThreadPacketProcessor()<span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$<init>(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/pool">pool</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span></code>
+<p>The given implementation for <a href="../-server/index.html">Server</a>. This class uses a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a> to store client <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a>s to the <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> objects, which represent
+server-side connections.
+<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/coroutine-context.html">CoroutineScope.coroutineContext</a> is overriden with <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html">Dispatchers.IO</a>+<a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/job.html">Messenger.job</a>. After
+accepting a Client, it writes a handshake packet (see <a href="../../com.github.yona168.giraffe.net.messenger.client/-g-client/index.html">GClient</a> description), giving it a session UUID as referenced by <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/session-u-u-i-d.html">Client.sessionUUID</a>. Any
+<a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> that uses this server should handle the packet accordingly, or ignore it.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="clients.html">clients</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">clients</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-collection/index.html"><span class="identifier">Collection</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">&gt;</span></code>
+<p>A collection of all connected clients</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="coroutine-context.html">coroutineContext</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">coroutineContext</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html"><span class="identifier">CoroutineContext</span></a></code>
+<p>The <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> that this client will use for launching coroutines. In <a href="./index.html">GServer</a>,
+this is set to <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html">Dispatchers.IO</a>+<a href="#">job</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="socket-channel.html">socketChannel</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">socketChannel</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousServerSocketChannel.html"><span class="identifier">AsynchronousServerSocketChannel</span></a></code>
+<p>The <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousServerSocketChannel.html">AsynchronousServerSocketChannel</a> that accepts client connections</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger/-messenger/buffer-pool.html">bufferPool</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">bufferPool</span><span class="symbol">: </span><a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span></code>
+<p>the <a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">Pool</a> of <a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a>s to use to process packets with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger/-messenger/packet-processor.html">packetProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">val </span><span class="identifier">packetProcessor</span><span class="symbol">: </span><a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a></code>
+<p>the <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> of this object</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="close-client.html">closeClient</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">closeClient</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$closeClient(java.util.UUID)/uuid">uuid</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html"><span class="identifier">UUID</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Closes a client server-side. This disables the client on both ends.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="init-close.html">initClose</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">initClose</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Shutdown processes to happen specific to the implementation. This happens after <a href="#">CoroutineScope.cancel</a> is called.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="on-connect.html">onConnect</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">onConnect</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$onConnect(kotlin.Function1((com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Unit)))/func">func</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GServer</span></a></code>
+<p>Registers a function to run with a connection once it connects.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="on-disable.html">onDisable</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="keyword">vararg</span> <span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$onDisable(kotlin.Array((java.lang.Runnable)))/listeners">listeners</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html"><span class="identifier">Runnable</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GServer</span></a></code>
+<p>Register listeners to run on disable.</p>
+<code><span class="keyword">fun </span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$onDisable(kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GServer</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="on-enable.html">onEnable</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="keyword">vararg</span> <span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$onEnable(kotlin.Array((java.lang.Runnable)))/listeners">listeners</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html"><span class="identifier">Runnable</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GServer</span></a></code>
+<p>Register listeners to run on enable.</p>
+<code><span class="keyword">fun </span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$onEnable(kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GServer</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="send-to-client.html">sendToClient</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">sendToClient</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$sendToClient(java.util.UUID, com.github.yona168.giraffe.net.packet.SendablePacket)/uuid">uuid</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html"><span class="identifier">UUID</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$sendToClient(java.util.UUID, com.github.yona168.giraffe.net.packet.SendablePacket)/packet">packet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Sends a packet to a specified client. This calls <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/write.html">Client.write</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-server/on-connect.html">onConnect</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">onConnect</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.Server$onConnect(java.util.function.Consumer((com.github.yona168.giraffe.net.messenger.client.Client)))/func">func</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html"><span class="identifier">Consumer</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="../-server/index.html"><span class="identifier">Server</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../-server/send-to-all-clients.html">sendToAllClients</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">sendToAllClients</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.Server$sendToAllClients(com.github.yona168.giraffe.net.packet.SendablePacket)/packet">packet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Sends a packet to all clients in <a href="../-server/clients.html">clients</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Extension Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-disable.html">onDisable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onDisable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-enable.html">onEnable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onEnable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

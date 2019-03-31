@@ -28,6 +28,9 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+sourceSets{
+    main.kotlin.srcDirs+="src/main/kotlin"
+}
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
@@ -42,7 +45,7 @@ compileKotlin {
 }
 
 dokka {
-    outputFormat = 'javadoc'
+    outputFormat = 'html'
     outputDirectory = file("javadoc")
     jdkVersion=8
     sourceRoot {

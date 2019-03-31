@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GServer.<init> - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.server</a>&nbsp;/&nbsp;<a href="index.html">GServer</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="com.github.yona168.giraffe.net.messenger.server.GServer$&lt;init&gt;(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))"></a>
+<code><span class="identifier">GServer</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$<init>(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/address">address</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html"><span class="identifier">SocketAddress</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$<init>(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a>&nbsp;<span class="symbol">=</span>&nbsp;SingleThreadPacketProcessor()<span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.GServer$<init>(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/pool">pool</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>The given implementation for <a href="../-server/index.html">Server</a>. This class uses a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a> to store client <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a>s to the <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> objects, which represent
+server-side connections.
+<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/coroutine-context.html">CoroutineScope.coroutineContext</a> is overriden with <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html">Dispatchers.IO</a>+<a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/job.html">Messenger.job</a>. After
+accepting a Client, it writes a handshake packet (see <a href="../../com.github.yona168.giraffe.net.messenger.client/-g-client/index.html">GClient</a> description), giving it a session UUID as referenced by <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/session-u-u-i-d.html">Client.sessionUUID</a>. Any
+<a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> that uses this server should handle the packet accordingly, or ignore it.</p>
+<h3>Parameters</h3>
+<p><a name="address"></a>
+<code>address</code> - The <a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html">SocketAddress</a> to have the server run on</p>
+<p><a name="packetProcessor"></a>
+<code>packetProcessor</code> - The <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> to process received packets with.</p>
+<p><a name="pool"></a>
+<code>pool</code> - The <a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">Pool</a> to get empty packets from.</p>
+</BODY>
+</HTML>

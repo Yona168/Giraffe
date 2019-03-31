@@ -1,0 +1,133 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>PacketProcessorComponent - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.packetprocessor</a>&nbsp;/&nbsp;<a href="./index.html">PacketProcessorComponent</a><br/>
+<br/>
+<h1>PacketProcessorComponent</h1>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">PacketProcessorComponent</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a><span class="symbol">, </span><a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html"><span class="identifier">ScopedComponent</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Joins the abstractions for <a href="../-packet-processor/index.html">PacketProcessor</a> to <a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html">ScopedComponent</a></p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">PacketProcessorComponent</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p>Joins the abstractions for <a href="../-packet-processor/index.html">PacketProcessor</a> to <a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html">ScopedComponent</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/is-cancelled.html">isCancelled</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">val </span><span class="identifier">isCancelled</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>If all resources have been closed/cancelled</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/job.html">job</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">job</span><span class="symbol">: </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html"><span class="identifier">Job</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-packet-processor/disable-handler.html">disableHandler</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">disableHandler</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$disableHandler(kotlin.Byte)/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a></code>
+<p>Unregisters a read <a href="../../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a> from being processed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../-packet-processor/handle.html">handle</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">handle</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$handle(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/client">client</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$handle(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$handle(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/packet">packet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html"><span class="identifier">Job</span></a></code>
+<p>Processes a <a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a> by invoking a function, as registered with the passed <a href="../../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a>, with
+the <a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a> and an <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a>. This launches a new coroutine with <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/coroutine-context.html">coroutineContext</a> context, and returns its <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html">Job</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../-packet-processor/handle-suspend.html">handleSuspend</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">handleSuspend</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$handleSuspend(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/client">client</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$handleSuspend(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$handleSuspend(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/packet">packet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../-packet-processor/on.html">on</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">on</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$on(kotlin.Byte, kotlin.Function2((com.github.yona168.giraffe.net.messenger.client.Client, com.github.yona168.giraffe.net.packet.ReceivablePacket, kotlin.Unit)))/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor$on(kotlin.Byte, kotlin.Function2((com.github.yona168.giraffe.net.messenger.client.Client, com.github.yona168.giraffe.net.packet.ReceivablePacket, kotlin.Unit)))/func">func</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">,</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a></code>
+<p>Registers a read <a href="../../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a> to a function to process the packet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Extension Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-disable.html">onDisable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onDisable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-enable.html">onEnable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onEnable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-mapped-packet-processor/index.html">MappedPacketProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">MappedPacketProcessor</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">PacketProcessorComponent</span></a></code>
+<p>A <a href="../-packet-processor/index.html">PacketProcessor</a> that uses a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a> to register/unregister <a href="../../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a>s and packet handler functions from
+each other.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

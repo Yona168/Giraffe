@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>ContinuationCompletionHandler - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.constants</a>&nbsp;/&nbsp;<a href="./index.html">ContinuationCompletionHandler</a><br/>
+<br/>
+<h1>ContinuationCompletionHandler</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">ContinuationCompletionHandler</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/CompletionHandler.html"><span class="identifier">CompletionHandler</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">,</span>&nbsp;<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellable-continuation/index.html"><span class="identifier">CancellableContinuation</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/CompletionHandler.html">CompletionHandler</a> that resumes a <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellable-continuation/index.html">CancellableContinuation</a> on success, and resumes it with the exception on fail.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">ContinuationCompletionHandler</span><span class="symbol">(</span><span class="symbol">)</span></code>
+<p>A <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/CompletionHandler.html">CompletionHandler</a> that resumes a <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellable-continuation/index.html">CancellableContinuation</a> on success, and resumes it with the exception on fail.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="completed.html">completed</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">completed</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler$completed(com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler.T, kotlinx.coroutines.CancellableContinuation((com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler.T)))/result">result</span><span class="symbol">:</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler$completed(com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler.T, kotlinx.coroutines.CancellableContinuation((com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler.T)))/attachment">attachment</span><span class="symbol">:</span>&nbsp;<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellable-continuation/index.html"><span class="identifier">CancellableContinuation</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="failed.html">failed</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">failed</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler$failed(kotlin.Throwable, kotlinx.coroutines.CancellableContinuation((com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler.T)))/exc">exc</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html"><span class="identifier">Throwable</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler$failed(kotlin.Throwable, kotlinx.coroutines.CancellableContinuation((com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler.T)))/attachment">attachment</span><span class="symbol">:</span>&nbsp;<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellable-continuation/index.html"><span class="identifier">CancellableContinuation</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

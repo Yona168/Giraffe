@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GClient.newServerside - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.client</a>&nbsp;/&nbsp;<a href="index.html">GClient</a>&nbsp;/&nbsp;<a href="./new-serverside.html">newServerside</a><br/>
+<br/>
+<h1>newServerside</h1>
+<a name="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))"></a>
+<code><span class="identifier">@JvmStatic</span> <span class="identifier">@JvmOverloads</span> <span class="keyword">fun </span><span class="identifier">newServerside</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/socketChannel">socketChannel</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html"><span class="identifier">AsynchronousSocketChannel</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/sessionUUID">sessionUUID</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html"><span class="identifier">UUID</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/pool">pool</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span><span class="symbol">: </span><a href="index.html"><span class="identifier">GClient</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Creates a <a href="index.html">GClient</a> from a given <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html">AsynchronousSocketChannel</a> that will not connect on enable. It also has a given
+<a href="new-serverside.html#com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/sessionUUID">sessionUUID</a>.</p>
+<h3>Parameters</h3>
+<p><a name="socketChannel"></a>
+<code>socketChannel</code> - The already-connected <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html">AsynchronousSocketChannel</a> to use.</p>
+<p><a name="packetProcessor"></a>
+<code>packetProcessor</code> - The <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> to use.</p>
+<p><a name="sessionUUID"></a>
+<code>sessionUUID</code> - The <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a> to set the client's <a href="../-client/session-u-u-i-d.html">Client.sessionUUID</a> to</p>
+<p><a name="pool"></a>
+<code>pool</code> - The <a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">Pool</a> to get empty packets from, defaulting to <a href="../../com.github.yona168.giraffe.net.packet.pool/-byte-buffer-receivable-packet-pool/index.html">ByteBufferReceivablePacketPool</a></p>
+<p><strong>Return</strong><br/>
+A <a href="index.html">GClient</a> to wrap the given channel.</p>
+</BODY>
+</HTML>

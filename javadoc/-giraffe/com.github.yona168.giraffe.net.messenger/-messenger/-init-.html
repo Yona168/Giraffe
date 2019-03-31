@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Messenger.<init> - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger</a>&nbsp;/&nbsp;<a href="index.html">Messenger</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="com.github.yona168.giraffe.net.messenger.Messenger$&lt;init&gt;(com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))"></a>
+<code><span class="identifier">Messenger</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.Messenger$<init>(com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.Messenger$<init>(com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/bufferPool">bufferPool</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Provides base <a href="#">Component</a> functionality for objects with <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousChannel.html">AsynchronousChannel</a>s and a <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a>.
+Enable/Disable functionality is first handled by <a href="../-scoped-component/index.html">ScopedComponent</a>. On enable, <a href="packet-processor.html">packetProcessor</a> is enabled. On disable,
+<a href="init-close.html">initClose</a> is ran, and then <a href="socket-channel.html">socketChannel</a> is closed</p>
+<h3>Parameters</h3>
+<p><a name="packetProcessor"></a>
+<code>packetProcessor</code> - the <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> of this object</p>
+<p><a name="bufferPool"></a>
+<code>bufferPool</code> - the <a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">Pool</a> of <a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a>s to use to process packets with.</p>
+</BODY>
+</HTML>

@@ -1,0 +1,22 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>FixedThreadPoolPacketProcessor.<init> - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.packetprocessor</a>&nbsp;/&nbsp;<a href="index.html">FixedThreadPoolPacketProcessor</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="com.github.yona168.giraffe.net.messenger.packetprocessor.FixedThreadPoolPacketProcessor$&lt;init&gt;(kotlin.Int)"></a>
+<code><span class="identifier">FixedThreadPoolPacketProcessor</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.FixedThreadPoolPacketProcessor$<init>(kotlin.Int)/numThreads">numThreads</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>A <a href="../-mapped-packet-processor/index.html">MappedPacketProcessor</a> that launches coroutines from a fixed thread pool created with a specified amount of threads.
+numThreads must NOT exceed the amount defined by:</p>
+<pre><code>    Runtime.getRuntime().availableProcessors() - 1</code></pre>
+<p>Enabling will throw <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-argument-exception/index.html">IllegalArgumentException</a> if the amount of threads exceed the max amount or if the amount is not positive.</p>
+<h3>Parameters</h3>
+<p><a name="numThreads"></a>
+<code>numThreads</code> - The amount of threads to use in the thread pool</p>
+</BODY>
+</HTML>

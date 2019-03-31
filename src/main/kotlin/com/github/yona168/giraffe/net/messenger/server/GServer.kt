@@ -105,7 +105,7 @@ class GServer @JvmOverloads constructor(
     override fun onDisable(function: () -> Unit) = apply { super<Server>.onDisable(function) }
 
 
-    override suspend fun initClose() {
+    override fun initClose() {
         packetProcessor.disable()
         clients.forEach(::close)
     }

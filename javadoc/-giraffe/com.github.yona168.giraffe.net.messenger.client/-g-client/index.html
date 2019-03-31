@@ -1,0 +1,286 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>GClient - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.client</a>&nbsp;/&nbsp;<a href="./index.html">GClient</a><br/>
+<br/>
+<h1>GClient</h1>
+<code><span class="keyword">class </span><span class="identifier">GClient</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger/-messenger/index.html"><span class="identifier">Messenger</span></a><span class="symbol">, </span><a href="../-client/index.html"><span class="identifier">Client</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>The default implementation of <a href="../-client/index.html">Client</a>. For internal packets, this uses the opcode identifier of <a href="../../com.github.yona168.giraffe.net.constants/-i-n-t-e-r-n-a-l_-o-p-c-o-d-e.html">INTERNAL_OPCODE</a>.
+Thus, NOTHING else should be registered under that opcode. Further, any implementation of <a href="../../com.github.yona168.giraffe.net.messenger.server/-server/index.html">Server</a> that uses this class
+should send a <a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html">SendablePacket</a> made EXACTLY like this one:</p>
+<pre><code>    writeByte(Constants.HANDSHAKE_SUB_IDENTIFIER)
+    writeUUID(uuidToSend)</code></pre>
+<p>The <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a> sent will be set to <a href="session-u-u-i-d.html">sessionUUID</a>, thus establishing the same <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a> by both the Server and Client. Other than
+this requirement, this class is fit for use with any <a href="../../com.github.yona168.giraffe.net.messenger.server/-server/index.html">Server</a> implementation, or truly, even anything above that.</p>
+<p>This implementation uses <a href="#">Component</a> for enabling/disabling.</p>
+<p>This class is also used as the <a href="../-client/index.html">Client</a> implementation Server-side. Thus, some things
+work differently on both ends. These differences are determined based on the constructor used. As such, to make that more explicit,
+instances should be created through <a href="new-serverside.html">GClient.newServerside</a> and <a href="new-clientside.html">GClient.newClientside</a></p>
+<p>The differences are as follows:</p>
+<ol><li>server-side clients CANNOT be re-enabled, whereas client-side ones can.</li>
+<li>When they disable, server-side clients will NOT disable their <a href="../../com.github.yona168.giraffe.net.messenger/-messenger/packet-processor.html">packetProcessor</a>. It is assumed that they all
+share one packet processor from the server. If this is not the case with your server implementation, simply use <a href="on-disable.html">onDisable</a>
+to cancel it.</li>
+</ol>
+<p>Note that this implementation expects packets to be structured as follows:</p>
+<ol><li>Opcode of the packet (of type <a href="../../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a>).</li>
+<li>Size of the packet (of type <a href="../../com.github.yona168.giraffe.net.constants/-size.html">Size</a>).</li>
+<li>The rest of the bytes.
+Thus, any bytes sent with a <a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html">SendablePacket</a> should reflect this pattern. <a href="../../com.github.yona168.giraffe.net.packet/-queued-op-sendable-packet/index.html">QueuedOpSendablePacket</a> does this.</li>
+</ol>
+<h3>Parameters</h3>
+<p><a name="address"></a>
+<code>address</code> - the <a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html">SocketAddress</a> that this Client will connect to when it is enabled with <a href="#">Toggleable.enable</a>.</p>
+<p><a name="packetProcessor"></a>
+<code>packetProcessor</code> - The <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> that will be used to process received packets.</p>
+<p><a name="socketChannel"></a>
+<code>socketChannel</code> - The <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html">AsynchronousSocketChannel</a> used to send and receive data.</p>
+<p><a name="side"></a>
+<code>side</code> - The <a href="-side/index.html">Side</a> of this client, indicating if this is a "server-side" client or "client-side" client</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-side/index.html">Side</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">enum</span> <span class="keyword">class </span><span class="identifier">Side</span></code>
+<p>The "Side" (client or server) that this client is on. GServer uses GClient objects to process things server side.
+Thus, a client can have one of two sides. If <a href="new-serverside.html">newServerside</a> is used, <a href="side.html">GClient.side</a> is <a href="-side/-serverside.html">Side.Serverside</a>, and if
+<a href="new-clientside.html">newClientside</a> is used, <a href="side.html">GClient.side</a> is <a href="-side/-clientside.html">Side.Clientside</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="coroutine-context.html">coroutineContext</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">coroutineContext</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html"><span class="identifier">CoroutineContext</span></a></code>
+<p>The <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> that this client will use for launching coroutines. In <a href="./index.html">GClient</a>,
+this is set to <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html">Dispatchers.IO</a>+<a href="#">job</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="is-cancelled.html">isCancelled</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">isCancelled</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>If all resources have been closed/cancelled</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="session-u-u-i-d.html">sessionUUID</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">sessionUUID</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html"><span class="identifier">UUID</span></a><span class="symbol">?</span></code>
+<p>This client's <a href="session-u-u-i-d.html">sessionUUID</a>, as specified by the handshake packet mentioned in the class descriptor</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="side.html">side</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">side</span><span class="symbol">: </span><a href="-side/index.html"><span class="identifier">Side</span></a></code>
+<p>The <a href="-side/index.html">Side</a> of this client. If this client was created through <a href="new-serverside.html">newServerside</a>, this is <a href="-side/-serverside.html">Side.Serverside</a>. If it was
+created through <a href="#">clientside</a>, it's <a href="-side/-clientside.html">Side.Clientside</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="socket-channel.html">socketChannel</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">socketChannel</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html"><span class="identifier">AsynchronousSocketChannel</span></a></code>
+<p>The <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html">AsynchronousSocketChannel</a> that this client sends &amp; receives bytes over</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger/-messenger/buffer-pool.html">bufferPool</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">bufferPool</span><span class="symbol">: </span><a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span></code>
+<p>the <a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">Pool</a> of <a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a>s to use to process packets with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger/-messenger/packet-processor.html">packetProcessor</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">val </span><span class="identifier">packetProcessor</span><span class="symbol">: </span><a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a></code>
+<p>the <a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> of this object</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="equals.html">equals</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">equals</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$equals(kotlin.Any)/other">other</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="hash-code.html">hashCode</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">hashCode</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="init-close.html">initClose</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">initClose</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Shutdown processes to happen specific to the implementation. This happens after <a href="#">CoroutineScope.cancel</a> is called.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="on-disable.html">onDisable</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="keyword">vararg</span> <span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$onDisable(kotlin.Array((java.lang.Runnable)))/listeners">listeners</span><span class="symbol">:</span>&nbsp;<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-runnable.html"><span class="identifier">Runnable</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code>
+<p>Register listeners to run on disable.</p>
+<code><span class="keyword">fun </span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$onDisable(kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="on-enable.html">onEnable</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="keyword">vararg</span> <span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$onEnable(kotlin.Array((java.lang.Runnable)))/listeners">listeners</span><span class="symbol">:</span>&nbsp;<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-runnable.html"><span class="identifier">Runnable</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code>
+<p>Register listeners to run on enable.</p>
+<code><span class="keyword">fun </span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$onEnable(kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="on-handshake.html">onHandshake</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">onHandshake</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$onHandshake(kotlin.Function0((kotlin.Unit)))/func">func</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code>
+<p>Tells the client to execute this <a href="../-client/on-handshake.html#com.github.yona168.giraffe.net.messenger.client.Client$onHandshake(kotlin.Function0((kotlin.Unit)))/func">func</a> when it receives a specified handshake packet from the server. This
+means that packet sending across the socket channel is working, and thus this method is the earliest, safest method
+for sending packets from.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="on-packet-receive.html">onPacketReceive</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">onPacketReceive</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$onPacketReceive(kotlin.Function0((kotlin.Unit)))/func">func</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code>
+<p>Tells the client to execute this <a href="../-client/on-packet-receive.html#com.github.yona168.giraffe.net.messenger.client.Client$onPacketReceive(kotlin.Function0((kotlin.Unit)))/func">func</a> when it receives a packet,
+regardless of what packet that is. This <a href="../-client/index.html">Client</a> is passed as an argument
+to that function.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write.html">write</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">write</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient$write(com.github.yona168.giraffe.net.packet.SendablePacket)/packet">packet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html"><span class="identifier">CompletableFuture</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">&gt;</span></code>
+<p>Launches a coroutine that writes the bytes from a <a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html">SendablePacket</a> to this <a href="socket-channel.html">socketChannel</a>.
+<a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/build.html">SendablePacket.build</a> is called to obtain a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/ByteBuffer.html">ByteBuffer</a>, which is then read in its entirety into the channel.
+The <a href="#">controller</a> ensures that coroutines wait for the preceding one to complete before writing, in order to avoid
+errors. This process is asynchronous.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-client/on-handshake.html">onHandshake</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">onHandshake</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.Client$onHandshake(java.lang.Runnable)/func">func</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html"><span class="identifier">Runnable</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-client/index.html"><span class="identifier">Client</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../-client/on-packet-receive.html">onPacketReceive</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">onPacketReceive</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.Client$onPacketReceive(java.lang.Runnable)/func">func</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html"><span class="identifier">Runnable</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-client/index.html"><span class="identifier">Client</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Companion Object Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="new-clientside.html">newClientside</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">newClientside</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newClientside(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/address">address</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html"><span class="identifier">SocketAddress</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newClientside(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/timeoutMillis">timeoutMillis</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a>&nbsp;<span class="symbol">=</span>&nbsp;1000<span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newClientside(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a>&nbsp;<span class="symbol">=</span>&nbsp;CustomContextPacketProcessor.defaultDispatch()<span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newClientside(java.net.SocketAddress, kotlin.Long, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/pool">pool</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code>
+<p>Creates a <a href="./index.html">GClient</a> that opens a new <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html">AsynchronousSocketChannel</a> and connects it to the address when it enables.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="new-serverside.html">newServerside</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">newServerside</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/socketChannel">socketChannel</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html"><span class="identifier">AsynchronousSocketChannel</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/sessionUUID">sessionUUID</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html"><span class="identifier">UUID</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/pool">pool</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">GClient</span></a></code>
+<p>Creates a <a href="./index.html">GClient</a> from a given <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousSocketChannel.html">AsynchronousSocketChannel</a> that will not connect on enable. It also has a given
+<a href="new-serverside.html#com.github.yona168.giraffe.net.messenger.client.GClient.Companion$newServerside(java.nio.channels.AsynchronousSocketChannel, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, java.util.UUID, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/sessionUUID">sessionUUID</a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Extension Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-disable.html">onDisable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onDisable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onDisable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/on-enable.html">onEnable</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">Component</span><span class="symbol">.</span><span class="identifier">onEnable</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net$onEnable(com.gitlab.avelyn.architecture.base.Component, kotlin.Function0((kotlin.Unit)))/function">function</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Component</span></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

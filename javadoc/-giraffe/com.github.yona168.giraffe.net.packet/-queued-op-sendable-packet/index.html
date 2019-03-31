@@ -1,0 +1,130 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>QueuedOpSendablePacket - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.packet</a>&nbsp;/&nbsp;<a href="./index.html">QueuedOpSendablePacket</a><br/>
+<br/>
+<h1>QueuedOpSendablePacket</h1>
+<code><span class="keyword">class </span><span class="identifier">QueuedOpSendablePacket</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>An implementation of <a href="../-sendable-packet/index.html">SendablePacket</a> that queues writing operations until building. This allows for multiple builds
+of a packet as well as easy ability to prepend information. This implementation builds a packet as follows:</p>
+<ol><li>The opcode of the packet (of type <a href="../../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a>).</li>
+<li>The size of the packet (of type <a href="../../com.github.yona168.giraffe.net.constants/-size.html">Size</a>).</li>
+<li>The rest of the bytes.</li>
+</ol>
+<h3>Parameters</h3>
+<p><a name="opcode"></a>
+<code>opcode</code> - the Opcode of this packet.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">QueuedOpSendablePacket</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$<init>(kotlin.Byte)/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">)</span></code>
+<p>An implementation of <a href="../-sendable-packet/index.html">SendablePacket</a> that queues writing operations until building. This allows for multiple builds
+of a packet as well as easy ability to prepend information. This implementation builds a packet as follows:</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="build.html">build</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">build</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/8/docs/api/java/nio/ByteBuffer.html"><span class="identifier">ByteBuffer</span></a></code>
+<p>Builds the packet. This can be called multiple times because operations are queued.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-byte.html">writeByte</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">writeByte</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$writeByte(kotlin.Byte)/b">b</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte/index.html"><span class="identifier">Byte</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p>Writes a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte/index.html">Byte</a> into this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-bytes.html">writeBytes</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">writeBytes</span><span class="symbol">(</span><span class="keyword">vararg</span> <span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$writeBytes(kotlin.ByteArray)/b">b</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte/index.html"><span class="identifier">Byte</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p>Writes some <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte/index.html">Byte</a>s into this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-double.html">writeDouble</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">writeDouble</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$writeDouble(kotlin.Double)/d">d</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-double/index.html"><span class="identifier">Double</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p>Writes a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-double/index.html">Double</a> into this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-int.html">writeInt</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">writeInt</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$writeInt(kotlin.Int)/i">i</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p>Writes an <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a> into this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-long.html">writeLong</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">writeLong</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$writeLong(kotlin.Long)/l">l</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p>Writes a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a> into this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-short.html">writeShort</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">writeShort</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$writeShort(kotlin.Short)/s">s</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-short/index.html"><span class="identifier">Short</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p>Writes a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-short/index.html">Short</a> into this packet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="write-string.html">writeString</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">writeString</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$writeString(kotlin.String)/s">s</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">QueuedOpSendablePacket</span></a></code>
+<p>Writes a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a> into this packet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-sendable-packet/write-u-u-i-d.html">writeUUID</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">writeUUID</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.SendablePacket$writeUUID(java.util.UUID)/uuid">uuid</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html"><span class="identifier">UUID</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a></code>
+<p>Writes a <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a> into this packet by writing the UUID's <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html#mostSigBits">UUID.mostSigBits</a> and <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html#leastSigBits">UUID.leastSigBits</a> as <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a>s into this packet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

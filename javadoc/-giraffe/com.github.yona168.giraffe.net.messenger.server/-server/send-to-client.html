@@ -1,0 +1,21 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Server.sendToClient - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.server</a>&nbsp;/&nbsp;<a href="index.html">Server</a>&nbsp;/&nbsp;<a href="./send-to-client.html">sendToClient</a><br/>
+<br/>
+<h1>sendToClient</h1>
+<a name="com.github.yona168.giraffe.net.messenger.server.Server$sendToClient(java.util.UUID, com.github.yona168.giraffe.net.packet.SendablePacket)"></a>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">sendToClient</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.Server$sendToClient(java.util.UUID, com.github.yona168.giraffe.net.packet.SendablePacket)/uuid">uuid</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html"><span class="identifier">UUID</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server.Server$sendToClient(java.util.UUID, com.github.yona168.giraffe.net.packet.SendablePacket)/packet">packet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html"><span class="identifier">SendablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Sends a packet to a specified client. This calls <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/write.html">Client.write</a></p>
+<h3>Parameters</h3>
+<p><a name="uuid"></a>
+<code>uuid</code> - The session <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a> of the client, as referenced with <a href="../../com.github.yona168.giraffe.net.messenger.client/-client/session-u-u-i-d.html">Client.sessionUUID</a></p>
+<p><strong>Return</strong><br/>
+true if a client for <a href="send-to-client.html#com.github.yona168.giraffe.net.messenger.server.Server$sendToClient(java.util.UUID, com.github.yona168.giraffe.net.packet.SendablePacket)/uuid">uuid</a> existed and was written <a href="send-to-client.html#com.github.yona168.giraffe.net.messenger.server.Server$sendToClient(java.util.UUID, com.github.yona168.giraffe.net.packet.SendablePacket)/packet">packet</a></p>
+</BODY>
+</HTML>

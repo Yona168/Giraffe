@@ -1,0 +1,236 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>alltypes - Giraffe</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<h3>All Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet/-byte-buffer-receivable-packet/index.html">com.github.yona168.giraffe.net.packet.ByteBufferReceivablePacket</a></td>
+<td>
+<p>A <a href="../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a> backed by a <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/ByteBuffer.html">ByteBuffer</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet.pool/-byte-buffer-receivable-packet-pool/index.html">com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool</a></td>
+<td>
+<p>A pool for <a href="../com.github.yona168.giraffe.net.packet/-byte-buffer-receivable-packet/index.html">ByteBufferReceivablePacket</a>s.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-can-process-packets/index.html">com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets</a></td>
+<td>
+<p>An object that has a <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> as a field</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.client/-client/index.html">com.github.yona168.giraffe.net.messenger.client.Client</a></td>
+<td>
+<p>Defines the basic functionality of a client. Giraffe implements this with <a href="../com.github.yona168.giraffe.net.messenger.client/-g-client/index.html">GClient</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component/index.html">com.gitlab.avelyn.architecture.base.Component</a> (extensions in package com.github.yona168.giraffe.net)</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net/com.gitlab.avelyn.architecture.base.-component.html">com.gitlab.avelyn.architecture.base.Component</a> (extensions in package com.github.yona168.giraffe.net)</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.constants/-continuation-completion-handler/index.html">com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler</a></td>
+<td>
+<p>A <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/CompletionHandler.html">CompletionHandler</a> that resumes a <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellable-continuation/index.html">CancellableContinuation</a> on success, and resumes it with the exception on fail.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-custom-context-packet-processor/index.html">com.github.yona168.giraffe.net.messenger.packetprocessor.CustomContextPacketProcessor</a></td>
+<td>
+<p>A <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-mapped-packet-processor/index.html">MappedPacketProcessor</a> that handles packets on a custom <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-fixed-thread-pool-packet-processor/index.html">com.github.yona168.giraffe.net.messenger.packetprocessor.FixedThreadPoolPacketProcessor</a></td>
+<td>
+<p>A <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-mapped-packet-processor/index.html">MappedPacketProcessor</a> that launches coroutines from a fixed thread pool created with a specified amount of threads.
+numThreads must NOT exceed the amount defined by:</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet.pool/-fluid-pool/index.html">com.github.yona168.giraffe.net.packet.pool.FluidPool</a></td>
+<td>
+<p>A pool that can supply new instances if none are available.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.client/-g-client/index.html">com.github.yona168.giraffe.net.messenger.client.GClient</a></td>
+<td>
+<p>The default implementation of <a href="../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a>. For internal packets, this uses the opcode identifier of <a href="../com.github.yona168.giraffe.net.constants/-i-n-t-e-r-n-a-l_-o-p-c-o-d-e.html">INTERNAL_OPCODE</a>.
+Thus, NOTHING else should be registered under that opcode. Further, any implementation of <a href="../com.github.yona168.giraffe.net.messenger.server/-server/index.html">Server</a> that uses this class
+should send a <a href="../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html">SendablePacket</a> made EXACTLY like this one:</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.server/-g-server/index.html">com.github.yona168.giraffe.net.messenger.server.GServer</a></td>
+<td>
+<p>The given implementation for <a href="../com.github.yona168.giraffe.net.messenger.server/-server/index.html">Server</a>. This class uses a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a> to store client <a href="http://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a>s to the <a href="../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> objects, which represent
+server-side connections.
+<a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/coroutine-context.html">CoroutineScope.coroutineContext</a> is overriden with <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html">Dispatchers.IO</a>+<a href="../com.github.yona168.giraffe.net.messenger/-scoped-component/job.html">Messenger.job</a>. After
+accepting a Client, it writes a handshake packet (see <a href="../com.github.yona168.giraffe.net.messenger.client/-g-client/index.html">GClient</a> description), giving it a session UUID as referenced by <a href="../com.github.yona168.giraffe.net.messenger.client/-client/session-u-u-i-d.html">Client.sessionUUID</a>. Any
+<a href="../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> that uses this server should handle the packet accordingly, or ignore it.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net/-java-tester/index.html">com.github.yona168.giraffe.net.JavaTester</a></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net/-java-tester/index.html">com.github.yona168.giraffe.net.JavaTester</a></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-mapped-packet-processor/index.html">com.github.yona168.giraffe.net.messenger.packetprocessor.MappedPacketProcessor</a></td>
+<td>
+<p>A <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> that uses a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a> to register/unregister <a href="../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a>s and packet handler functions from
+each other.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger/-messenger/index.html">com.github.yona168.giraffe.net.messenger.Messenger</a></td>
+<td>
+<p>Provides base <a href="#">Component</a> functionality for objects with <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousChannel.html">AsynchronousChannel</a>s and a <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a>.
+Enable/Disable functionality is first handled by <a href="../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html">ScopedComponent</a>. On enable, <a href="../com.github.yona168.giraffe.net.messenger/-messenger/packet-processor.html">packetProcessor</a> is enabled. On disable,
+<a href="../com.github.yona168.giraffe.net.messenger/-messenger/init-close.html">initClose</a> is ran, and then <a href="../com.github.yona168.giraffe.net.messenger/-messenger/socket-channel.html">socketChannel</a> is closed</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.constants/-opcode.html">com.github.yona168.giraffe.net.constants.Opcode</a></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor</a></td>
+<td>
+<p>A PacketProcessor is used to process <a href="../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">ReceivablePacket</a>s.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor-component/index.html">com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessorComponent</a></td>
+<td>
+<p>Joins the abstractions for <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> to <a href="../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html">ScopedComponent</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">com.github.yona168.giraffe.net.packet.pool.Pool</a></td>
+<td>
+<p>A supplier of objects that reuses passed old ones. This allows for less instances and thus more efficiency.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet/-queued-op-sendable-packet/index.html">com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket</a></td>
+<td>
+<p>An implementation of <a href="../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html">SendablePacket</a> that queues writing operations until building. This allows for multiple builds
+of a packet as well as easy ability to prepend information. This implementation builds a packet as follows:</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet.pool/-queued-pool/index.html">com.github.yona168.giraffe.net.packet.pool.QueuedPool</a></td>
+<td>
+<p>An implementation of <a href="../com.github.yona168.giraffe.net.packet.pool/-fluid-pool/index.html">FluidPool</a> that uses a <a href="http://docs.oracle.com/javase/8/docs/api/java/util/Deque.html">Deque</a> to store objects.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html">com.github.yona168.giraffe.net.packet.ReceivablePacket</a></td>
+<td>
+<p>A packet that can be processed by a <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html">com.github.yona168.giraffe.net.messenger.ScopedComponent</a></td>
+<td>
+<p>A <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html">CoroutineScope</a> that gets a new job when it enables, and cancels it when it disables.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.packet/-sendable-packet/index.html">com.github.yona168.giraffe.net.packet.SendablePacket</a></td>
+<td>
+<p>A packet that can be sent to a <a href="../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a> with <a href="../com.github.yona168.giraffe.net.messenger.client/-client/write.html">Client.write</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.server/-server/index.html">com.github.yona168.giraffe.net.messenger.server.Server</a></td>
+<td>
+<p>The central object to route client connections.</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-single-thread-packet-processor/index.html">com.github.yona168.giraffe.net.messenger.packetprocessor.SingleThreadPacketProcessor</a></td>
+<td>
+<p>A <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> that processes all packets on one thread. This is convinient if packets must be processed
+in a sequential order. Creating an instance of this class is equivalent to creating a <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-fixed-thread-pool-packet-processor/index.html">FixedThreadPoolPacketProcessor</a>
+with a thread amount of 1</p>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.constants/-size.html">com.github.yona168.giraffe.net.constants.Size</a></td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net/kotlin.-string/index.html">kotlin.String</a> (extensions in package com.github.yona168.giraffe.net)</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net/kotlin.-string.html">kotlin.String</a> (extensions in package com.github.yona168.giraffe.net)</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<a href="../com.github.yona168.giraffe.net.messenger/-toggled/index.html">com.github.yona168.giraffe.net.messenger.Toggled</a></td>
+<td>
+<p>Extension of <a href="#">Toggleable</a> that allows actions to occur on enable and on disable.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

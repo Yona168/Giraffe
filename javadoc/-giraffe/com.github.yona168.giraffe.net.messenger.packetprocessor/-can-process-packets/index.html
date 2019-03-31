@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>CanProcessPackets - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.messenger.packetprocessor</a>&nbsp;/&nbsp;<a href="./index.html">CanProcessPackets</a><br/>
+<br/>
+<h1>CanProcessPackets</h1>
+<code><span class="keyword">interface </span><span class="identifier">CanProcessPackets</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>An object that has a <a href="../-packet-processor/index.html">PacketProcessor</a> as a field</p>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="packet-processor.html">packetProcessor</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">val </span><span class="identifier">packetProcessor</span><span class="symbol">: </span><a href="../-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a></code>
+<p>The <a href="../-packet-processor/index.html">PacketProcessor</a> contained by the implementing class</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="disable-handler.html">disableHandler</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">disableHandler</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$disableHandler(kotlin.Byte)/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">CanProcessPackets</span></a></code>
+<p>Calls <a href="../-packet-processor/disable-handler.html">PacketProcessor.disableHandler</a> with <a href="packet-processor.html">packetProcessor</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="handle.html">handle</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">handle</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$handle(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/client">client</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$handle(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$handle(com.github.yona168.giraffe.net.messenger.client.Client, kotlin.Byte, com.github.yona168.giraffe.net.packet.ReceivablePacket)/packet">packet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html"><span class="identifier">Job</span></a></code>
+<p>Calls <a href="../-packet-processor/handle.html">PacketProcessor.handle</a> with <a href="packet-processor.html">packetProcessor</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="on.html">on</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">on</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$on(kotlin.Byte, kotlin.Function2((com.github.yona168.giraffe.net.messenger.client.Client, com.github.yona168.giraffe.net.packet.ReceivablePacket, kotlin.Unit)))/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$on(kotlin.Byte, kotlin.Function2((com.github.yona168.giraffe.net.messenger.client.Client, com.github.yona168.giraffe.net.packet.ReceivablePacket, kotlin.Unit)))/func">func</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">,</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">CanProcessPackets</span></a></code>
+<p>Calls <a href="../-packet-processor/on.html">PacketProcessor.on</a> with <a href="packet-processor.html">packetProcessor</a></p>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">on</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$on(kotlin.Byte, java.util.function.BiConsumer((com.github.yona168.giraffe.net.messenger.client.Client, com.github.yona168.giraffe.net.packet.ReceivablePacket)))/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.packetprocessor.CanProcessPackets$on(kotlin.Byte, java.util.function.BiConsumer((com.github.yona168.giraffe.net.messenger.client.Client, com.github.yona168.giraffe.net.packet.ReceivablePacket)))/func">func</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html"><span class="identifier">BiConsumer</span></a><span class="symbol">&lt;</span><a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html"><span class="identifier">Client</span></a><span class="symbol">,</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">CanProcessPackets</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger.client/-client/index.html">Client</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">Client</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger/-toggled/index.html"><span class="identifier">Toggled</span></a><span class="symbol">, </span><a href="./index.html"><span class="identifier">CanProcessPackets</span></a><span class="symbol">, </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html"><span class="identifier">CoroutineScope</span></a></code>
+<p>Defines the basic functionality of a client. Giraffe implements this with <a href="../../com.github.yona168.giraffe.net.messenger.client/-g-client/index.html">GClient</a>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger/-messenger/index.html">Messenger</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">class </span><span class="identifier">Messenger</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html"><span class="identifier">ScopedComponent</span></a><span class="symbol">, </span><a href="./index.html"><span class="identifier">CanProcessPackets</span></a></code>
+<p>Provides base <a href="#">Component</a> functionality for objects with <a href="http://docs.oracle.com/javase/8/docs/api/java/nio/channels/AsynchronousChannel.html">AsynchronousChannel</a>s and a <a href="../-packet-processor/index.html">PacketProcessor</a>.
+Enable/Disable functionality is first handled by <a href="../../com.github.yona168.giraffe.net.messenger/-scoped-component/index.html">ScopedComponent</a>. On enable, <a href="../../com.github.yona168.giraffe.net.messenger/-messenger/packet-processor.html">packetProcessor</a> is enabled. On disable,
+<a href="../../com.github.yona168.giraffe.net.messenger/-messenger/init-close.html">initClose</a> is ran, and then <a href="../../com.github.yona168.giraffe.net.messenger/-messenger/socket-channel.html">socketChannel</a> is closed</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="../../com.github.yona168.giraffe.net.messenger.server/-server/index.html">Server</a><br/>
+(JVM)</p>
+</td>
+<td>
+<code><span class="keyword">interface </span><span class="identifier">Server</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.messenger/-toggled/index.html"><span class="identifier">Toggled</span></a><span class="symbol">, </span><a href="./index.html"><span class="identifier">CanProcessPackets</span></a><span class="symbol">, </span><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html"><span class="identifier">CoroutineScope</span></a></code>
+<p>The central object to route client connections.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>QueuedOpSendablePacket.<init> - Giraffe</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="../index.html">com.github.yona168.giraffe.net.packet</a>&nbsp;/&nbsp;<a href="index.html">QueuedOpSendablePacket</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$&lt;init&gt;(kotlin.Byte)"></a>
+<code><span class="identifier">QueuedOpSendablePacket</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket$<init>(kotlin.Byte)/opcode">opcode</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.yona168.giraffe.net.constants/-opcode.html"><span class="identifier">Opcode</span></a><span class="symbol">)</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>An implementation of <a href="../-sendable-packet/index.html">SendablePacket</a> that queues writing operations until building. This allows for multiple builds
+of a packet as well as easy ability to prepend information. This implementation builds a packet as follows:</p>
+<ol><li>The opcode of the packet (of type <a href="../../com.github.yona168.giraffe.net.constants/-opcode.html">Opcode</a>).</li>
+<li>The size of the packet (of type <a href="../../com.github.yona168.giraffe.net.constants/-size.html">Size</a>).</li>
+<li>The rest of the bytes.</li>
+</ol>
+<h3>Parameters</h3>
+<p><a name="opcode"></a>
+<code>opcode</code> - the Opcode of this packet.</p>
+</BODY>
+</HTML>

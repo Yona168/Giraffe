@@ -8,7 +8,7 @@ import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool
 import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.gitlab.avelyn.architecture.base.Component
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import java.nio.channels.AsynchronousChannel
 
 /**
@@ -25,17 +25,14 @@ abstract class Messenger(
 ) : ScopedComponent(),
     CanProcessPackets {
     abstract val socketChannel: AsynchronousChannel
-
     init {
         onEnable {
             packetProcessor.enable()
         }
         onDisable {
-            runBlocking {
-                initClose()
-                if (socketChannel.isOpen) {
-                    socketChannel.close()
-                }
+            initClose()
+            if (socketChannel.isOpen) {
+                socketChannel.close()
             }
         }
     }
@@ -43,7 +40,7 @@ abstract class Messenger(
     /**
      * Shutdown processes to happen specific to the implementation. This happens after [CoroutineScope.cancel] is called.
      */
-    protected abstract suspend fun initClose()
+    protected abstract fun initClose()
 
 }
 

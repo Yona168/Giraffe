@@ -1,0 +1,26 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>accept - Giraffe</title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">Giraffe</a>&nbsp;/&nbsp;<a href="index.html">com.github.yona168.giraffe.net.messenger.server</a>&nbsp;/&nbsp;<a href="./accept.html">accept</a><br/>
+<br/>
+<h1>accept</h1>
+<a name="com.github.yona168.giraffe.net.messenger.server$accept(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))"></a>
+<code><span class="identifier">@JvmOverloads</span> <span class="keyword">fun </span><span class="identifier">accept</span><span class="symbol">(</span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server$accept(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/address">address</span><span class="symbol">:</span>&nbsp;<a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html"><span class="identifier">SocketAddress</span></a><span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server$accept(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/packetProcessor">packetProcessor</span><span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html"><span class="identifier">PacketProcessor</span></a>&nbsp;<span class="symbol">=</span>&nbsp;SingleThreadPacketProcessor()<span class="symbol">, </span><span class="identifier" id="com.github.yona168.giraffe.net.messenger.server$accept(java.net.SocketAddress, com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor, com.github.yona168.giraffe.net.packet.pool.Pool((com.github.yona168.giraffe.net.packet.ReceivablePacket)))/pool">pool</span><span class="symbol">:</span>&nbsp;<a href="../com.github.yona168.giraffe.net.packet.pool/-pool/index.html"><span class="identifier">Pool</span></a><span class="symbol">&lt;</span><a href="../com.github.yona168.giraffe.net.packet/-receivable-packet/index.html"><span class="identifier">ReceivablePacket</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">=</span>&nbsp;ByteBufferReceivablePacketPool()<span class="symbol">)</span><span class="symbol">: </span><a href="-server/index.html"><span class="identifier">Server</span></a></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Creates a new <a href="-g-server/index.html">GServer</a> with the passed arguments.
+If another implementation of <a href="-server/index.html">Server</a> is made default besides <a href="-g-server/index.html">GServer</a>, this function will change to reflect that.</p>
+<h3>Parameters</h3>
+<p><a name="address"></a>
+<code>address</code> - The <a href="http://docs.oracle.com/javase/8/docs/api/java/net/SocketAddress.html">SocketAddress</a> to have the server accept on on enable.</p>
+<p><a name="packetProcessor"></a>
+<code>packetProcessor</code> - The <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-packet-processor/index.html">PacketProcessor</a> to use, defaulting to <a href="../com.github.yona168.giraffe.net.messenger.packetprocessor/-single-thread-packet-processor/index.html">SingleThreadPacketProcessor</a>.</p>
+<p><a name="pool"></a>
+<code>pool</code> - The <a href="../com.github.yona168.giraffe.net.packet.pool/-pool/index.html">Pool</a> to get empty packets from.</p>
+<p><strong>Return</strong><br/>
+A <a href="-server/index.html">Server</a> that, when enabled, starts accepting clients.</p>
+</BODY>
+</HTML>
