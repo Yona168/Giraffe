@@ -1,6 +1,7 @@
 package com.github.yona168.giraffe.net.messenger.packetprocessor
 
 import com.github.yona168.giraffe.net.onEnable
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 

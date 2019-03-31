@@ -47,7 +47,13 @@ interface Server : Toggled, CanProcessPackets, CoroutineScope {
     fun sendToAllClients(packet: SendablePacket) = clients.forEach { it.write(packet) }
 
     override fun onEnable(vararg listeners: Runnable): Server
+    @JvmDefault
+    override fun onEnable(function: () -> Unit)=apply{super.onEnable(function)}
+
     override fun onDisable(vararg listeners: Runnable): Server
+    @JvmDefault
+    override fun onDisable(function: () -> Unit)=apply{super.onEnable(function)}
+
 
     @JvmDefault
     override fun on(opcode: Opcode, func: (Client, ReceivablePacket) -> Unit): Server {
