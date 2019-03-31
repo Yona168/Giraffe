@@ -1,8 +1,9 @@
 package com.github.yona168.giraffe.net.messenger.packetprocessor
 
+import com.github.yona168.giraffe.net.onDisable
 import com.github.yona168.giraffe.net.onEnable
-import kotlinx.coroutines.asCoroutineDispatcher
-import java.util.concurrent.Executors
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -17,19 +18,26 @@ import kotlin.coroutines.CoroutineContext
  */
 open class FixedThreadPoolPacketProcessor(numThreads: Int) : MappedPacketProcessor() {
     override lateinit var coroutineContext: CoroutineContext
+    private lateinit var dispatcher: ExecutorCoroutineDispatcher
 
     init {
         onEnable {
             val maxThreads = Runtime.getRuntime().availableProcessors() - 1
-            coroutineContext = job + when (numThreads > maxThreads) {
-                true -> throw IllegalArgumentException("Amount of threads passed in exceeds max thread availability! Your amount: $numThreads. Max amount: $maxThreads")
-                false -> {
-                    when (numThreads <= 0) {
-                        true -> throw IllegalArgumentException("Amount of threads must exceed 0! Your amount: $numThreads")
-                        false-> Executors.newFixedThreadPool(numThreads).asCoroutineDispatcher()
+            if (numThreads > maxThreads) {
+                throw IllegalArgumentException("Amount of threads passed in exceeds max thread availability! Your amount: $numThreads. Max amount: $maxThreads")
+            } else {
+                @Suppress("EXPERIMENTAL_API_USAGE")
+                when (numThreads <= 0) {
+                    true -> throw IllegalArgumentException("Amount of threads must exceed 0! Your amount: $numThreads")
+                    false -> {
+                        dispatcher=newFixedThreadPoolContext(numThreads, "Giraffe Pool")
+                        coroutineContext=dispatcher+job
                     }
                 }
             }
+        }
+        onDisable {
+            dispatcher.close()
         }
     }
 }

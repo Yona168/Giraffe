@@ -1,18 +1,21 @@
 package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.constants.*
-import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
+import com.github.yona168.giraffe.net.messenger.Messenger
 import com.github.yona168.giraffe.net.messenger.client.GClient.Companion.Side
+import com.github.yona168.giraffe.net.messenger.packetprocessor.CustomContextPacketProcessor
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.messenger.server.Server
 import com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket
+import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.SendablePacket
+import com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool
+import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.gitlab.avelyn.architecture.base.Component
 import com.gitlab.avelyn.architecture.base.Toggleable
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.lang.Runnable
 import java.net.SocketAddress
 import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
@@ -61,9 +64,10 @@ class GClient private constructor(
     side: Side,
     address: SocketAddress?,
     packetProcessor: PacketProcessor,
+    pool: Pool<ReceivablePacket>,
     socketChannel: AsynchronousSocketChannel,
     private val timeoutMillis: Long
-) : AbstractScopedPacketChannelComponent(packetProcessor), Client {
+) : Messenger(packetProcessor, pool), Client {
 
     /**
      * The [AsynchronousSocketChannel] that this client sends & receives bytes over
@@ -97,12 +101,12 @@ class GClient private constructor(
     /**
      * The collection of listeners ran when a packet is received, registered through [onPacketReceive]
      */
-    private val onPacketReceiveListeners: MutableSet<(Client)->Unit> = mutableSetOf()
+    private val onPacketReceiveListeners: MutableSet<() -> Unit> = mutableSetOf()
 
     /**
      * The collection of listeners ran when the handshake packet is received, registered through [onHandshake]
      */
-    private val onHandshakeListeners: MutableSet<(Client)->Unit> = mutableSetOf()
+    private val onHandshakeListeners: MutableSet<() -> Unit> = mutableSetOf()
 
     /**
      * A [UUID] used for [hashCode], as [sessionUUID] cannot be used for that
@@ -167,12 +171,12 @@ class GClient private constructor(
                 connect(address as SocketAddress)
 
 
-                packetProcessor.on(INTERNAL_OPCODE) { _,packet ->
+                packetProcessor.on(INTERNAL_OPCODE) { _, packet ->
                     val opcode = packet.readByte()
                     when (opcode) {
                         HANDSHAKE_SUB_IDENTIFIER -> {
                             backingSessionUUID = packet.readUUID()
-                            onHandshakeListeners.forEach { it(this) }
+                            onHandshakeListeners.forEach { it() }
                         }
                     }
                 }
@@ -195,11 +199,13 @@ class GClient private constructor(
     private constructor(
         socketChannel: AsynchronousSocketChannel,
         packetProcessor: PacketProcessor,
+        pool: Pool<ReceivablePacket>,
         sessionUUID: UUID
     ) : this(
         side = Side.Serverside,
         address = null,
         packetProcessor = packetProcessor,
+        pool = pool,
         socketChannel = socketChannel,
         timeoutMillis = 0
     ) {
@@ -213,10 +219,16 @@ class GClient private constructor(
      * @param[address] The [SocketAddress] that this client will connect to
      * @param[packetProcessor] The [PacketProcessor] to be used by this client
      */
-    private constructor(address: SocketAddress, packetProcessor: PacketProcessor, timeoutMillis: Long) : this(
+    private constructor(
+        address: SocketAddress,
+        packetProcessor: PacketProcessor,
+        pool: Pool<ReceivablePacket>,
+        timeoutMillis: Long
+    ) : this(
         side = Side.Clientside,
         address = address,
         packetProcessor = packetProcessor,
+        pool = pool,
         socketChannel = AsynchronousSocketChannel.open(),
         timeoutMillis = timeoutMillis
     )
@@ -266,16 +278,16 @@ class GClient private constructor(
     }
 
 
-    override fun onPacketReceive(func: (Client)->Unit) = apply { onPacketReceiveListeners.add(func) }
+    override fun onPacketReceive(func: () -> Unit) = apply { onPacketReceiveListeners.add(func) }
 
-    override fun onHandshake(func: (Client)->Unit) = apply { onHandshakeListeners.add(func) }
+    override fun onHandshake(func: () -> Unit) = apply { onHandshakeListeners.add(func) }
 
 
-    override fun onEnable(vararg listeners: Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
-    override fun onEnable(function: ()->Unit)= apply { super<Client>.onEnable(function) }
+    override fun onEnable(vararg listeners: Runnable) = apply { super<Messenger>.onEnable(*listeners) }
+    override fun onEnable(function: () -> Unit) = apply { super<Client>.onEnable(function) }
 
-    override fun onDisable(vararg listeners: Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onDisable(*listeners)}
-    override fun onDisable(function: ()->Unit):GClient = apply { super<Client>.onDisable(function) }
+    override fun onDisable(vararg listeners: Runnable) = apply { super<Messenger>.onDisable(*listeners) }
+    override fun onDisable(function: () -> Unit): GClient = apply { super<Client>.onDisable(function) }
 
     /**
      * Reads a bunch of bytes from the channel into [inbox]. If the result is -1, which usually means
@@ -327,7 +339,7 @@ class GClient private constructor(
                     buffer.put(inbox.get())
                 }
                 buffer.prepareRead()
-                onPacketReceiveListeners.forEach { it(this@GClient) }
+                onPacketReceiveListeners.forEach { it() }
                 val setOpcode = opcode
                 launch(coroutineContext) {
                     packetProcessor.handleSuspend(
@@ -387,26 +399,34 @@ class GClient private constructor(
          * @param[socketChannel] The already-connected [AsynchronousSocketChannel] to use.
          * @param[packetProcessor] The [PacketProcessor] to use.
          * @param[sessionUUID] The [UUID] to set [sessionUUID] to
+         * @param[pool] The [Pool] to get empty packets from, defaulting to [ByteBufferReceivablePacketPool]
          * @return A [GClient] to wrap the given channel.
          */
-        @JvmStatic
+        @JvmStatic @JvmOverloads
         fun newServerside(
             socketChannel: AsynchronousSocketChannel,
             packetProcessor: PacketProcessor,
-            sessionUUID: UUID
-        ) =
-            GClient(socketChannel, packetProcessor, sessionUUID)
+            sessionUUID: UUID,
+            pool: Pool<ReceivablePacket> = ByteBufferReceivablePacketPool()
+
+        ) = GClient(socketChannel, packetProcessor, pool,sessionUUID)
 
         /**
          * Creates a [GClient] that opens a new [AsynchronousSocketChannel] and connects it to the address when it enables.
          * @param[address] The [SocketAddress] to connect to on enable.
-         * @param[packetProcessor] The [PacketProcessor] to use.
-         * @param[timeoutMillis] How long the client will wait to finish connecting before giving up (in milliseconds).
+         * @param[packetProcessor] The [PacketProcessor] to use, defaulting to [CustomContextPacketProcessor.defaultDispatch]
+         * @param[timeoutMillis] How long the client will wait to finish connecting before giving up (in milliseconds), defaulting to 1000.
+         * @param[pool] The [pool] to get empty packets from, defaulting to a [ByteBufferReceivablePacketPool].
          * @return A [GClient] that, when enabled, attempts to connect to a server specified by the [address].
          */
         @JvmStatic
-        fun newClientside(address: SocketAddress, packetProcessor: PacketProcessor, timeoutMillis: Long) =
-            GClient(address, packetProcessor, timeoutMillis)
+        @JvmOverloads
+        fun newClientside(
+            address: SocketAddress,
+            timeoutMillis: Long = 1000,
+            packetProcessor: PacketProcessor = CustomContextPacketProcessor.defaultDispatch(),
+            pool: Pool<ReceivablePacket> = ByteBufferReceivablePacketPool()
+        ) = GClient(address, packetProcessor, pool, timeoutMillis)
 
         /**
          * An object to supply a [ContinuationCompletionHandler] to handle reading/writing bytes across the channel.

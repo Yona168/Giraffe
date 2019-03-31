@@ -14,7 +14,7 @@ class CustomContextPacketProcessor(context: CoroutineContext) : MappedPacketProc
 
     init {
         onEnable {
-            coroutineContext = job + context
+            coroutineContext = context+job
         }
     }
 

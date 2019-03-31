@@ -36,7 +36,7 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      * @param[func] The function to execute when a packet is received, prior to processing it
      * @return this for chaining.
      */
-    fun onPacketReceive(func: (Client) -> Unit): Client
+    fun onPacketReceive(func: () -> Unit): Client
 
 
     /**
@@ -47,7 +47,7 @@ interface Client : Toggled, CanProcessPackets, CoroutineScope {
      * @param[func] the function to execute when a specified handshake packet is received.
      * @return this for chaining.
      */
-    fun onHandshake(func: (Client) -> Unit): Client
+    fun onHandshake(func: () -> Unit): Client
 
 
     override fun onEnable(vararg listeners: Runnable): Client

@@ -8,27 +8,23 @@ import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool
 import com.github.yona168.giraffe.net.packet.pool.Pool
 import com.gitlab.avelyn.architecture.base.Component
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.nio.channels.AsynchronousChannel
 
 /**
  * Provides base [Component] functionality for objects with [AsynchronousChannel]s and a [PacketProcessor].
- * On enable, the [packetProcessor] is enabled, and on disable [initClose] is first ran, [coroutineContext] is canelled, and finally,
- * [socketChannel] is closed.
+ * Enable/Disable functionality is first handled by [ScopedComponent]. On enable, [packetProcessor] is enabled. On disable,
+ * [initClose] is ran, and then [socketChannel] is closed
  *
  * @param[packetProcessor] the [PacketProcessor] of this object
  * @param[bufferPool] the [Pool] of [ReceivablePacket]s to use to process packets with.
  */
-abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
+abstract class Messenger(
     override val packetProcessor: PacketProcessor,
     protected val bufferPool: Pool<ReceivablePacket> = ByteBufferReceivablePacketPool()
-) : Component(),
-    CanProcessPackets, CoroutineScope {
+) : ScopedComponent(),
+    CanProcessPackets {
     abstract val socketChannel: AsynchronousChannel
-    val job = Job()
 
     init {
         onEnable {
@@ -37,7 +33,6 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
         onDisable {
             runBlocking {
                 initClose()
-                this@AbstractScopedPacketChannelComponent.coroutineContext.cancel()
                 if (socketChannel.isOpen) {
                     socketChannel.close()
                 }
@@ -46,7 +41,7 @@ abstract class AbstractScopedPacketChannelComponent @JvmOverloads constructor(
     }
 
     /**
-     * Shutdown processes to happen before [socketChannel] is closed and [coroutineContext] is cancelled.
+     * Shutdown processes to happen specific to the implementation. This happens after [CoroutineScope.cancel] is called.
      */
     protected abstract suspend fun initClose()
 

@@ -2,17 +2,25 @@
 
 package com.github.yona168.giraffe.net.messenger.client
 
+import com.github.yona168.giraffe.net.messenger.packetprocessor.CustomContextPacketProcessor
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
+import com.github.yona168.giraffe.net.packet.ReceivablePacket
+import com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool
+import com.github.yona168.giraffe.net.packet.pool.Pool
 import java.net.SocketAddress
 
 /**
- * Here for verb-based aspect of Avelyn. Simply calls  [GClient.newClientside] with the passed args.
- * Using this also ensures that if any other implementation of [Client] is used as the default, it can be easily replaced
- * without changing any function calls.
- * @param[address] The [SocketAddress] to connect to on enable.
- * @param[packetProcessor] The [PacketProcessor] to use.
- * @param[timeoutMillis] How long the client will wait to finish connecting before giving up (in milliseconds).
- * @return A [Client] that, when enabled, attempts to connect to a server specified by the [address]
+ * This simply calls [GClient.newClientside] with the passed arguments.
+ * This is simply here to provide a layer of abstraction for a default [Client]
+ * implementation. If, for some reason, a different implementation of [Client] besides
+ *[GClient] is made the default [Client] to use, this function will update with that.
+ * @see[GClient.newClientside]
  */
-fun connect(address: SocketAddress, packetProcessor: PacketProcessor, timeoutMillis: Long): Client =
-    GClient.newClientside(address = address, packetProcessor = packetProcessor, timeoutMillis = timeoutMillis)
+@JvmOverloads
+fun connect(
+    address: SocketAddress,
+    timeoutMillis: Long = 1000,
+    packetProcessor: PacketProcessor = CustomContextPacketProcessor.defaultDispatch(),
+    pool: Pool<ReceivablePacket> = ByteBufferReceivablePacketPool()
+): Client =
+    GClient.newClientside(address = address, packetProcessor = packetProcessor, timeoutMillis = timeoutMillis, pool = pool)
