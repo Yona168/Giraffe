@@ -404,13 +404,11 @@ class GClient private constructor(
          * [sessionUUID].
          * @param[socketChannel] The already-connected [AsynchronousSocketChannel] to use.
          * @param[packetProcessor] The [PacketProcessor] to use.
-         * @param[sessionUUID] The [UUID] to set [sessionUUID] to
+         * @param[sessionUUID] The [UUID] to set the client's [Client.sessionUUID] to
          * @param[pool] The [Pool] to get empty packets from, defaulting to [ByteBufferReceivablePacketPool]
          * @return A [GClient] to wrap the given channel.
          */
-        @JvmStatic
-        @JvmOverloads
-        fun newServerside(
+       @JvmStatic @JvmOverloads fun newServerside(
             socketChannel: AsynchronousSocketChannel,
             packetProcessor: PacketProcessor,
             sessionUUID: UUID,
@@ -426,9 +424,7 @@ class GClient private constructor(
          * @param[pool] The [pool] to get empty packets from, defaulting to a [ByteBufferReceivablePacketPool].
          * @return A [GClient] that, when enabled, attempts to connect to a server specified by the [address].
          */
-        @JvmStatic
-        @JvmOverloads
-        fun newClientside(
+        @JvmStatic @JvmOverloads fun newClientside(
             address: SocketAddress,
             timeoutMillis: Long = 1000,
             packetProcessor: PacketProcessor = CustomContextPacketProcessor.defaultDispatch(),

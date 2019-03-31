@@ -1,6 +1,5 @@
 package com.github.yona168.giraffe.net.messenger.server
 
-import com.github.yona168.giraffe.net.address
 import com.github.yona168.giraffe.net.constants.ContinuationCompletionHandler
 import com.github.yona168.giraffe.net.constants.HANDSHAKE_SUB_IDENTIFIER
 import com.github.yona168.giraffe.net.constants.INTERNAL_OPCODE
@@ -15,7 +14,6 @@ import com.github.yona168.giraffe.net.packet.packetBuilder
 import com.github.yona168.giraffe.net.packet.pool.ByteBufferReceivablePacketPool
 import com.github.yona168.giraffe.net.packet.pool.Pool
 import kotlinx.coroutines.*
-import kotlinx.coroutines.NonCancellable.isActive
 import java.net.SocketAddress
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
@@ -32,6 +30,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @param[address] The [SocketAddress] to have the server run on
  * @param[packetProcessor] The [PacketProcessor] to process received packets with.
+ * @param[pool] The [Pool] to get empty packets from.
  */
 class GServer @JvmOverloads constructor(
     address: SocketAddress,

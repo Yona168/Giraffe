@@ -6,7 +6,7 @@ import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import kotlinx.coroutines.launch
 
 /**
- * A [PacketProcessor] that uses a [Map] to register/unregister [Opcode]s and [PacketHandlerFunction]s from
+ * A [PacketProcessor] that uses a [Map] to register/unregister [Opcode]s and packet handler functions from
  * each other.
  */
 abstract class MappedPacketProcessor : PacketProcessorComponent() {
