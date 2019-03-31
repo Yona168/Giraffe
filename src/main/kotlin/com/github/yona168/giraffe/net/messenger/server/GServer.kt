@@ -95,10 +95,10 @@ class GServer constructor(
     }
 
     override fun onEnable(vararg listeners: java.lang.Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
-    override fun onEnable(listeners: ()->Unit)=apply { super<Server>.onEnable(listeners) }
+    override fun onEnable(function: ()->Unit)=apply { super<Server>.onEnable(function) }
 
     override fun onDisable(vararg listeners: java.lang.Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onDisable(*listeners)}
-    override fun onDisable(listeners: ()->Unit)=apply { super<Server>.onDisable(listeners) }
+    override fun onDisable(function: ()->Unit)=apply { super<Server>.onDisable(function) }
 
 
     override suspend fun initClose() {

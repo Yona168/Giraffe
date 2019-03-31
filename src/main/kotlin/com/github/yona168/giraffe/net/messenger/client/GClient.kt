@@ -2,13 +2,10 @@ package com.github.yona168.giraffe.net.messenger.client
 
 import com.github.yona168.giraffe.net.constants.*
 import com.github.yona168.giraffe.net.messenger.AbstractScopedPacketChannelComponent
-import com.github.yona168.giraffe.net.messenger.Toggled
 import com.github.yona168.giraffe.net.messenger.client.GClient.Companion.Side
 import com.github.yona168.giraffe.net.messenger.packetprocessor.PacketProcessor
 import com.github.yona168.giraffe.net.messenger.server.Server
-import com.github.yona168.giraffe.net.onEnable
 import com.github.yona168.giraffe.net.packet.QueuedOpSendablePacket
-import com.github.yona168.giraffe.net.packet.ReceivablePacket
 import com.github.yona168.giraffe.net.packet.SendablePacket
 import com.gitlab.avelyn.architecture.base.Component
 import com.gitlab.avelyn.architecture.base.Toggleable
@@ -23,7 +20,6 @@ import java.nio.channels.AsynchronousSocketChannel
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -276,10 +272,10 @@ class GClient private constructor(
 
 
     override fun onEnable(vararg listeners: Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onEnable(*listeners)}
-    override fun onEnable(listeners: ()->Unit)= apply { super<Client>.onEnable(listeners) }
+    override fun onEnable(function: ()->Unit)= apply { super<Client>.onEnable(function) }
 
     override fun onDisable(vararg listeners: Runnable)=apply{super<AbstractScopedPacketChannelComponent>.onDisable(*listeners)}
-    override fun onDisable(listeners: ()->Unit):GClient = apply { super<Client>.onDisable(listeners) }
+    override fun onDisable(function: ()->Unit):GClient = apply { super<Client>.onDisable(function) }
 
     /**
      * Reads a bunch of bytes from the channel into [inbox]. If the result is -1, which usually means
