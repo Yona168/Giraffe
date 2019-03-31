@@ -69,13 +69,15 @@ class GClient private constructor(
     private val timeoutMillis: Long
 ) : Messenger(packetProcessor, pool), Client {
 
+    private lateinit var backingSocketChannel: AsynchronousSocketChannel
+
     /**
      * The [AsynchronousSocketChannel] that this client sends & receives bytes over
      */
     override val socketChannel: AsynchronousSocketChannel
         get() = backingSocketChannel
 
-    private var backingSocketChannel: AsynchronousSocketChannel = socketChannel
+
     /**
      * The [CoroutineContext] that this client will use for launching coroutines. In [GClient],
      * this is set to [Dispatchers.IO]+[job]
@@ -115,15 +117,15 @@ class GClient private constructor(
 
 
     /**
+     * The backing property for [sessionUUID]
+     */
+    private var backingSessionUUID: UUID? = null
+
+    /**
      * This client's [sessionUUID], as specified by the handshake packet mentioned in the class descriptor
      */
     override val sessionUUID: UUID?
         get() = backingSessionUUID
-
-    /**
-     * The backing property for [sessionUUID]
-     */
-    private var backingSessionUUID: UUID? = null
 
 
     /**
@@ -143,21 +145,21 @@ class GClient private constructor(
         On enable, if the socket channel is closed and the side is serverside, that means this is not the first enable. Throw an exception if so.
         If its clientside, just back a new channel and reset the session uuid
          */
-        this.onEnable {
-            if (!socketChannel.isOpen) {
+        onEnable {
+            backingSocketChannel = socketChannel
+            if (!this.socketChannel.isOpen) {
                 when (side) {
                     Side.Serverside -> throw IllegalStateException("A Server-side GClient cannot be re-enabled!")
                     Side.Clientside -> {
                         backingSocketChannel = AsynchronousSocketChannel.open()
-                        backingSessionUUID = null
                     }
                 }
-                sequenceOf(StandardSocketOptions.SO_RCVBUF, StandardSocketOptions.SO_SNDBUF).forEach {
-                    socketChannel.setOption(
-                        it,
-                        MAX_PACKET_BYTE_SIZE
-                    )
-                }
+            }
+            sequenceOf(StandardSocketOptions.SO_RCVBUF, StandardSocketOptions.SO_SNDBUF).forEach {
+                this.socketChannel.setOption(
+                    it,
+                    MAX_PACKET_BYTE_SIZE
+                )
             }
             /*
             Grab a Read/Write handler based on side
@@ -169,8 +171,6 @@ class GClient private constructor(
             if (side == Side.Clientside) {
                 Objects.requireNonNull(address)
                 connect(address as SocketAddress)
-
-
                 packetProcessor.on(INTERNAL_OPCODE) { _, packet ->
                     val opcode = packet.readByte()
                     when (opcode) {
@@ -184,6 +184,12 @@ class GClient private constructor(
             }
             //Start reading from channel
             loopRead()
+        }
+
+        onDisable {
+            if (side == Side.Clientside) {
+                backingSessionUUID = null
+            }
         }
     }
 
@@ -402,14 +408,15 @@ class GClient private constructor(
          * @param[pool] The [Pool] to get empty packets from, defaulting to [ByteBufferReceivablePacketPool]
          * @return A [GClient] to wrap the given channel.
          */
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun newServerside(
             socketChannel: AsynchronousSocketChannel,
             packetProcessor: PacketProcessor,
             sessionUUID: UUID,
             pool: Pool<ReceivablePacket> = ByteBufferReceivablePacketPool()
 
-        ) = GClient(socketChannel, packetProcessor, pool,sessionUUID)
+        ) = GClient(socketChannel, packetProcessor, pool, sessionUUID)
 
         /**
          * Creates a [GClient] that opens a new [AsynchronousSocketChannel] and connects it to the address when it enables.
